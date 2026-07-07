@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block page_title %}Import Data{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h4 class="mb-1"><i class="bi bi-file-earmark-spreadsheet"></i> Import Data from CSV</h4>
+        <p class="text-muted small mb-0">Upload Excel exports saved as <strong>.csv</strong> (File → Save As → CSV in Excel).</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0">Import Type</h6>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for key, item in import_types.items %}
+                <a href="?type={{ key }}"
+                   class="list-group-item list-group-item-action {% if current_type == key %}active{% endif %}">
+                    {{ item.label }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">{{ meta.label }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info small">
+                    <strong>Required columns:</strong> {{ meta.columns }}
+                    <br>
+                    <a href="{% url 'core:import_template' current_type %}" class="alert-link">
+                        <i class="bi bi-download"></i> Download sample template
+                    </a>
+                </div>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="import_type" value="{{ current_type }}">
+
+                    {% if meta.needs_exam %}
+                    <div class="mb-3">
+                        <label class="form-label">Exam (optional — or include exam/subject columns in CSV)</label>
+                        <select name="exam_id" class="form-select">
+                            <option value="">— Use columns in CSV —</option>
+                            {% for exam in exams %}
+                            <option value="{{ exam.id }}">{{ exam.name }} — {{ exam.subject.name }} ({{ exam.class_room }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label class="form-label">CSV File</label>
+                        <input type="file" name="csv_file" accept=".csv" class="form-control" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-upload"></i> Upload &amp; Import
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {% if result %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Import Results</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center mb-3">
+                    <div class="col-md-3">
+                        <div class="p-3 bg-success bg-opacity-10 rounded">
+                            <h4 class="text-success mb-0">{{ result.created }}</h4>
+                            <small>Created</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-primary bg-opacity-10 rounded">
+                            <h4 class="text-primary mb-0">{{ result.updated|default:0 }}</h4>
+                            <small>Updated</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-danger bg-opacity-10 rounded">
+                            <h4 class="text-danger mb-0">{{ result.errors }}</h4>
+                            <small>Errors</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-secondary bg-opacity-10 rounded">
+                            <h4 class="mb-0">{{ result.total_rows }}</h4>
+                            <small>Total Rows</small>
+                        </div>
+                    </div>
+                </div>
+                {% if result.error_details %}
+                <h6 class="text-danger">Error Details</h6>
+                <ul class="small text-danger">
+                    {% for err in result.error_details %}
+                    <li>{{ err }}</li>
+                    {% endfor %}
+                </ul>
+                {% if result.errors > result.error_details|length %}
+                <p class="small text-muted">Showing first {{ result.error_details|length }} errors only.</p>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

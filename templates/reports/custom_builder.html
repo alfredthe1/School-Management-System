@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block page_title %}Custom Report Builder{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h1 class="h3 fw-bold">Advanced Report Builder</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="get">
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Generate Report</button>
+        </form>
+    </div>
+</div>
+
+{% if report_data %}
+<div class="card mt-4">
+    <div class="card-body">
+        <h5>Report Preview</h5>
+        <pre>{{ report_data|safe }}</pre>
+        <!-- In real, generate download link based on type -->
+        <a href="#" class="btn btn-success">Download PDF/Excel</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

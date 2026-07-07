@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load notification_tags %}
+{% block page_title %}Notifications{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h2 class="h4 fw-bold mb-1"><i class="bi bi-bell-fill text-primary"></i> Notifications</h2>
+        <p class="text-muted mb-0">Messages and alerts from {{ school_name }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if unread_count %}
+        <form method="post" action="{% url 'communication:mark_all_read' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="bi bi-check2-all"></i> Mark all read</button>
+        </form>
+        {% endif %}
+        <a href="{% url 'communication:send_message' %}" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square"></i> Compose</a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-semibold d-flex justify-content-between">
+                <span><i class="bi bi-inbox-fill"></i> Inbox</span>
+                {% if unread_count %}<span class="badge bg-danger">{{ unread_count }} unread</span>{% endif %}
+            </div>
+            <div class="list-group list-group-flush">
+                {% for n in received %}
+                <a href="{% url 'communication:notification_detail' n.pk %}" class="list-group-item list-group-item-action {% if not n.is_read %}bg-light border-start border-primary border-3{% endif %}">
+                    <div class="d-flex gap-3 align-items-start">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                             style="width:42px;height:42px;background:{% if n.priority == 'urgent' %}#fee2e2{% elif n.priority == 'high' %}#fef3c7{% else %}#e0f2fe{% endif %};">
+                            <i class="bi {{ n.icon_class }} {% if n.priority == 'urgent' %}text-danger{% elif n.priority == 'high' %}text-warning{% else %}text-primary{% endif %}"></i>
+                        </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="d-flex justify-content-between gap-2">
+                                <strong class="{% if not n.is_read %}text-dark{% endif %}">{{ n.title }}</strong>
+                                <small class="text-muted text-nowrap">{{ n.created_at|timesince }} ago</small>
+                            </div>
+                            <small class="text-muted"><i class="bi bi-person"></i> {{ n.sender.get_full_name|default:n.sender.username }}</small>
+                            <p class="mb-0 small text-muted text-truncate">{{ n.message }}</p>
+                            <span class="badge bg-{{ n.priority|priority_badge }} mt-1" style="font-size:0.7rem;">
+                                <i class="bi {{ n.priority_icon }}"></i> {{ n.get_priority_display }}
+                            </span>
+                        </div>
+                        {% if not n.is_read %}<i class="bi bi-circle-fill text-primary" style="font-size:0.5rem;"></i>{% endif %}
+                    </div>
+                </a>
+                {% empty %}
+                <div class="list-group-item text-center text-muted py-5">
+                    <i class="bi bi-bell-slash display-4"></i>
+                    <p class="mt-2 mb-0">No notifications yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-semibold"><i class="bi bi-send-fill"></i> Sent</div>
+            <div class="list-group list-group-flush">
+                {% for n in sent %}
+                <div class="list-group-item">
+                    <div class="d-flex gap-2">
+                        <i class="bi {{ n.icon_class }} text-secondary"></i>
+                        <div>
+                            <strong class="small">{{ n.title }}</strong>
+                            <div class="small text-muted">To {{ n.recipient.get_full_name|default:n.recipient.username }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="list-group-item text-muted small">No sent messages.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

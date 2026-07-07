@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-lg rounded-4">
+            <div class="card-header bg-gradient text-white py-3" style="background: linear-gradient(135deg, #2C7BB6, #4AA3DF);">
+                <h4 class="mb-0"><i class="bi bi-person-plus"></i> {{ title|default:"Teacher Form" }}</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save</button>
+                        <a href="{% url 'teachers:list' %}" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Cancel</a>
+                    </div>
+                </form>
+                <hr>
+                <p class="text-muted small">
+                    <i class="bi bi-info-circle"></i> 
+                    A user account with role 'Teacher' will be created automatically.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

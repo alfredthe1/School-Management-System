@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block page_title %}Link a Child{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-link-45deg"></i> Link Your Child</div>
+            <div class="card-body">
+                <p class="text-muted">Enter your child's school ID and date of birth to verify and link them to your account.</p>
+                <form method="post">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.student_id.label }}</label>
+                        {{ form.student_id }}
+                        {% if form.student_id.errors %}<div class="text-danger small">{{ form.student_id.errors }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.date_of_birth.label }}</label>
+                        {{ form.date_of_birth }}
+                        {% if form.date_of_birth.errors %}<div class="text-danger small">{{ form.date_of_birth.errors }}</div>{% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Link Child</button>
+                    <a href="{% url 'parents:dashboard' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

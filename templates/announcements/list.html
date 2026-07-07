@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load role_tags notification_tags %}
+{% block page_title %}Announcements{% endblock %}
+{% block content %}
+<div class="dashboard-header mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <h1 class="h3 mb-1 fw-bold"><i class="bi bi-megaphone-fill"></i> Announcements</h1>
+        <p class="mb-0 opacity-75">Official notices from {{ school_name }}</p>
+    </div>
+    {% if user|has_role:"admin,headteacher" %}
+    <a href="{% url 'announcements:create' %}" class="btn btn-light btn-sm"><i class="bi bi-plus-circle"></i> New Announcement</a>
+    {% endif %}
+</div>
+<div class="row g-3">
+    {% for announcement in announcements %}
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex gap-3 align-items-start mb-2">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                         style="width:44px;height:44px;background:{% if announcement.priority == 'urgent' %}#fee2e2{% elif announcement.priority == 'high' %}#fef3c7{% else %}#e0f2fe{% endif %};">
+                        <i class="bi {{ announcement.priority|announcement_icon }} {% if announcement.priority == 'urgent' %}text-danger{% elif announcement.priority == 'high' %}text-warning{% else %}text-primary{% endif %} fs-5"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h5 class="fw-bold mb-1">{{ announcement.title }}</h5>
+                        <small class="text-muted">
+                            <i class="bi bi-person"></i> {{ announcement.author.get_full_name|default:announcement.author.username }}
+                            &bull; <i class="bi bi-calendar3"></i> {{ announcement.created_at|date:"M d, Y" }}
+                        </small>
+                    </div>
+                </div>
+                <p class="text-muted small mb-2">{{ announcement.content|truncatewords:30 }}</p>
+                <span class="badge bg-{{ announcement.priority|priority_badge }}">
+                    {{ announcement.get_priority_display }}
+                </span>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card text-center py-5 text-muted">
+            <i class="bi bi-megaphone display-4"></i>
+            <p class="mt-2">No announcements at this time.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

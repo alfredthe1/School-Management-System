@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><strong>{{ title }}</strong></div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+                    </div>
+                    {% endfor %}
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                    {% endif %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Save Exam</button>
+                        <a href="{% url 'examinations:exam_list' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

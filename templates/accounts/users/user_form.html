@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #1E3A5F, #2C7BB6);">
+                <h4 class="mb-0"><i class="bi bi-person-gear"></i> {{ title }}</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                    {% endif %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Username</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Role</label>
+                            {{ form.role }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Email</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Phone</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-medium">Address</label>
+                            {{ form.address }}
+                        </div>
+                        {% if form.password1 %}
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Password</label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}<div class="text-danger small">{{ form.password1.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Confirm Password</label>
+                            {{ form.password2 }}
+                        </div>
+                        {% endif %}
+                        <div class="col-12">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Account is active (user can log in)</label>
+                            </div>
+                            {% if form.is_active.errors %}<div class="text-danger small">{{ form.is_active.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Save User</button>
+                        <a href="{% if user_obj %}{% url 'accounts:user_detail' user_obj.pk %}{% else %}{% url 'accounts:user_list' %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

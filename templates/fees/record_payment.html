@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block page_title %}Record Payment{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-lg">
+            <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #27AE60, #2ECC71);">
+                <h5 class="mb-0"><i class="bi bi-cash-coin"></i> Record Fee Payment</h5>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted small mb-3">
+                    Select a student and enter payment details. A receipt number is generated automatically.
+                </p>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Save Payment
+                        </button>
+                        <a href="{% url 'fees:payment_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Parent Sign Up - Happy Child School{% endblock %}
+{% block content %}
+<div class="row justify-content-center py-4" style="background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fc 100%); margin: -1rem -1.5rem; min-height: 80vh;">
+    <div class="col-md-7 col-lg-6">
+        <div class="card border-0 shadow-lg rounded-4">
+            <div class="card-header text-white py-4 border-0 text-center" style="background: linear-gradient(135deg, #2C7BB6, #4AA3DF);">
+                {% if school_logo_url %}
+                <img src="{{ school_logo_url }}" alt="{{ school_name }}" class="auth-card-logo">
+                {% endif %}
+                <h4 class="fw-bold mb-1"><i class="bi bi-person-plus"></i> Parent Registration</h4>
+                <p class="mb-0 small opacity-75">Create your account to view results and pay fees</p>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Username</label>
+                            {{ form.username }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone (MTN / Airtel)</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Password</label>
+                            {{ form.password1 }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Confirm Password</label>
+                            {{ form.password2 }}
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    <h6 class="text-muted"><i class="bi bi-link-45deg"></i> Link Your Child (Optional)</h6>
+                    <p class="small text-muted">You can also link children after signing up from your dashboard.</p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.student_id.label }}</label>
+                            {{ form.student_id }}
+                            <small class="text-muted">{{ form.student_id.help_text }}</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.child_dob.label }}</label>
+                            {{ form.child_dob }}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold mt-4">
+                        <i class="bi bi-check-circle"></i> Create Account
+                    </button>
+                </form>
+                <hr>
+                <p class="text-center mb-0 small">Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

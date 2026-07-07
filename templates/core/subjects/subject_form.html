@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #1E3A5F, #2C7BB6);">
+                <h4 class="mb-0"><i class="bi bi-journal-plus"></i> {{ title }}</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Subject Name</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Subject Code</label>
+                        {{ form.code }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Class &amp; Stream</label>
+                        {{ form.class_room }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Assigned Teacher</label>
+                        {{ form.teacher }}
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Save</button>
+                    <a href="{% url 'core:subject_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

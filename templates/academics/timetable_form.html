@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block page_title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Timetable Entry{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h1 class="h3 fw-bold">{% if form.instance.pk %}Edit{% else %}Add{% endif %} Timetable Entry</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="{% url 'academics:timetable_grid' %}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+        <div class="mt-2 text-muted small">Conflict detection is active for class slot and teacher slot per term.</div>
+    </div>
+</div>
+{% endblock %}

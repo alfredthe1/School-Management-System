@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block page_title %}Payment Gateway{% endblock %}
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #1E3A5F, #2C7BB6);">
+        <h4 class="mb-0"><i class="bi bi-phone-vibrate"></i> Mobile Money Payment Gateway</h4>
+        <p class="mb-0 small opacity-75">Configure API keys in environment variables — ready when you receive credentials</p>
+    </div>
+    <div class="card-body p-4">
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card h-100 {% if gateway.live_mode %}border-success{% else %}border-warning{% endif %}">
+                    <div class="card-body text-center">
+                        <i class="bi bi-{% if gateway.live_mode %}check-circle-fill text-success{% else %}hourglass-split text-warning{% endif %} display-4"></i>
+                        <h5 class="mt-2">{% if gateway.live_mode %}Live Mode{% else %}Simulation Mode{% endif %}</h5>
+                        <p class="small text-muted mb-0">{% if gateway.simulation_mode %}Add API keys to enable real MTN/Airtel prompts{% else %}Parents receive real payment prompts on their phones{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-phone-fill text-warning display-4"></i>
+                        <h5 class="mt-2">MTN MoMo</h5>
+                        <span class="badge bg-{% if gateway.mtn_ready %}success{% else %}secondary{% endif %}">{% if gateway.mtn_ready %}Ready{% else %}Not configured{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-phone-fill text-danger display-4"></i>
+                        <h5 class="mt-2">Airtel Money</h5>
+                        <span class="badge bg-{% if gateway.airtel_ready %}success{% else %}secondary{% endif %}">{% if gateway.airtel_ready %}Ready{% else %}Not configured{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-lg-6">
+                <h5 class="fw-semibold"><i class="bi bi-list-check"></i> MTN MoMo checklist</h5>
+                <ul class="list-group list-group-flush">
+                    {% for item in gateway.mtn_checklist %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ item.label }}</span>
+                        {% if item.ok %}<i class="bi bi-check-circle-fill text-success"></i>{% else %}<code class="small">{{ item.env }}</code>{% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-lg-6">
+                <h5 class="fw-semibold"><i class="bi bi-list-check"></i> Airtel Money checklist</h5>
+                <ul class="list-group list-group-flush">
+                    {% for item in gateway.airtel_checklist %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ item.label }}</span>
+                        {% if item.ok %}<i class="bi bi-check-circle-fill text-success"></i>{% else %}<code class="small">{{ item.env }}</code>{% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="alert alert-light border mt-4 mb-0">
+            <h6 class="fw-semibold"><i class="bi bi-gear"></i> When you receive API keys</h6>
+            <ol class="small mb-0">
+                <li>Copy <code>.env.example</code> to <code>.env</code> and fill in MTN/Airtel credentials</li>
+                <li>Set callback URLs to your public domain (must be HTTPS in production)</li>
+                <li>Set <code>MOBILE_MONEY_CALLBACK_SECRET</code> for webhook security</li>
+                <li>Restart the server — this page will show <strong>Live Mode</strong></li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}

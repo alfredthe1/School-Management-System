@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block page_title %}Parent Result Access{% endblock %}
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #1E3A5F, #2C7BB6);">
+        <h4 class="mb-0"><i class="bi bi-shield-lock"></i> Parent Result Access Control</h4>
+        <p class="mb-0 small opacity-75">Restrict result viewing for parents with outstanding fee balances</p>
+    </div>
+    <div class="card-body p-4">
+        <form method="post" class="mb-0">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save_policy">
+            <div class="form-check form-switch mb-3">
+                {{ policy_form.block_parent_results_on_fee_balance }}
+                <label class="form-check-label fw-semibold" for="{{ policy_form.block_parent_results_on_fee_balance.id_for_label }}">
+                    {{ policy_form.block_parent_results_on_fee_balance.label }}
+                </label>
+            </div>
+            <p class="text-muted small mb-3">
+                When enabled, parents cannot see exam or assessment results while their child has a fee balance.
+                Use per-student overrides below for exceptions.
+            </p>
+            <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-save"></i> Save Policy</button>
+        </form>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <h6 class="text-muted small">Students Listed</h6>
+                <h3 class="fw-bold mb-0">{{ rows|length }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card h-100 border-start border-danger">
+            <div class="card-body">
+                <h6 class="text-muted small">With Fee Balance</h6>
+                <h3 class="fw-bold text-danger mb-0">{{ owing_count }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card h-100 border-start border-warning">
+            <div class="card-body">
+                <h6 class="text-muted small">Results Blocked</h6>
+                <h3 class="fw-bold text-warning mb-0">{{ blocked_count }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <input type="text" name="search" class="form-control" placeholder="Student, ID, parent..." value="{{ search }}">
+    </div>
+    <div class="col-md-2">
+        <select name="balance" class="form-select">
+            <option value="">All balances</option>
+            <option value="owing" {% if balance_filter == 'owing' %}selected{% endif %}>With balance</option>
+            <option value="clear" {% if balance_filter == 'clear' %}selected{% endif %}>Fully paid</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="access" class="form-select">
+            <option value="">All access</option>
+            <option value="blocked" {% if access_filter == 'blocked' %}selected{% endif %}>Blocked</option>
+            <option value="allowed" {% if access_filter == 'allowed' %}selected{% endif %}>Allowed</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="class" class="form-select">
+            <option value="">All classes</option>
+            {% for c in class_list %}
+            <option value="{{ c.id }}" {% if class_filter == c.id|stringformat:"s" %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-outline-primary w-100"><i class="bi bi-funnel"></i> Filter</button>
+    </div>
+</form>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="save_overrides">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Student</th>
+                            <th>Parent</th>
+                            <th>Class</th>
+                            <th>Fee Balance</th>
+                            <th>Effective Access</th>
+                            <th>Override</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                        <tr>
+                            <td>
+                                <strong>{{ row.student.get_full_name }}</strong>
+                                <div class="small text-muted">{{ row.student.student_id }}</div>
+                            </td>
+                            <td class="small">
+                                {% if row.student.parent %}
+                                {{ row.student.parent.get_full_name|default:row.student.parent.username }}
+                                {% else %}—{% endif %}
+                            </td>
+                            <td>{{ row.student.current_class|default:"—" }}</td>
+                            <td>
+                                {% if row.balance > 0 %}
+                                <span class="badge bg-danger">UGX {{ row.balance|floatformat:0 }}</span>
+                                {% else %}
+                                <span class="badge bg-success">Clear</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if row.can_view %}
+                                <span class="badge bg-success"><i class="bi bi-eye"></i> Allowed</span>
+                                {% else %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-eye-slash"></i> Blocked</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <select name="override_{{ row.student.pk }}" class="form-select form-select-sm" style="min-width: 11rem;">
+                                    {% for value, label in row.student.PARENT_RESULTS_ACCESS_CHOICES %}
+                                    <option value="{{ value }}" {% if row.student.parent_results_access == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="6" class="text-center text-muted py-4">No students match your filters.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% if rows %}
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-save"></i> Save Overrides</button>
+        </div>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}

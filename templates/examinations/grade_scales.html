@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block page_title %}Grade Scales{% endblock %}
+{% block content %}
+<div class="dashboard-header mb-4 d-flex justify-content-between align-items-center">
+    <h1 class="h3 fw-bold">Grade Scales</h1>
+    <a href="{% url 'examinations:exam_list' %}" class="btn btn-outline-light">Back to Exams</a>
+</div>
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Add Grade</div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-2">
+                        <label class="form-label small">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary btn-sm w-100">Add</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body p-0">
+                <table class="table mb-0 datatable" data-no-sort="3">
+                    <thead><tr><th>Grade</th><th>Range</th><th>Remark</th><th></th></tr></thead>
+                    <tbody>
+                        {% for scale in scales %}
+                        <tr>
+                            <td><span class="badge bg-primary">{{ scale.grade }}</span></td>
+                            <td>{{ scale.min_score }} – {{ scale.max_score }}</td>
+                            <td>{{ scale.remark }}</td>
+                            <td>
+                                <form method="post" action="{% url 'examinations:grade_scale_delete' scale.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-outline-danger">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-muted text-center py-3">No grade scales defined.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

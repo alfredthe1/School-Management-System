@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load role_tags %}
+{% block page_title %}Fee Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h1 class="h3 mb-1 fw-bold">💰 Fee & Expenditure Dashboard</h1>
+    <p class="mb-0 opacity-75">Academic Year: {{ current_year.name|default:"2025-2026" }}</p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted small">Total Collected</h6>
+                        <h3 class="fw-bold text-success">UGX {{ total_collected|floatformat:0 }}</h3>
+                    </div>
+                    <i class="bi bi-cash-stack display-6 text-success"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted small">Today's Collections</h6>
+                        <h3 class="fw-bold">UGX {{ today_collected|floatformat:0 }}</h3>
+                    </div>
+                    <i class="bi bi-calendar-day display-6 text-primary"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted small">This Month</h6>
+                        <h3 class="fw-bold">UGX {{ month_collected|floatformat:0 }}</h3>
+                    </div>
+                    <i class="bi bi-calendar-month display-6 text-info"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card h-100 border-start border-danger">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted small">Pending</h6>
+                        <h3 class="fw-bold text-danger">UGX {{ pending_fees|floatformat:0 }}</h3>
+                    </div>
+                    <i class="bi bi-exclamation-triangle display-6 text-danger"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                <h3>UGX {{ month_collected|floatformat:0 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning shadow">
+            <div class="card-body">
+                <h6><i class="bi bi-exclamation-triangle"></i> Pending Fees</h6>
+                <h3>UGX {{ pending_fees|floatformat:0 }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-secondary text-white">Expenditure Summary</div>
+            <div class="card-body">
+                <p><strong>Total:</strong> UGX {{ total_expenditure|floatformat:0 }}</p>
+                <p><strong>This Month:</strong> UGX {{ month_expenditure|floatformat:0 }}</p>
+                <a href="{% url 'fees:expenditure_list' %}" class="btn btn-sm btn-primary">View All</a>
+                <a href="{% url 'fees:expenditure_add' %}" class="btn btn-sm btn-success">Add Expenditure</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-secondary text-white">Quick Actions</div>
+            <div class="card-body">
+                <a href="{% url 'fees:fee_structure_list' %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-list"></i> Fee Structures</a>
+                {% if user|has_role:"admin" %}
+                <a href="{% url 'fees:fee_structure_add' %}" class="btn btn-sm btn-outline-success"><i class="bi bi-plus-circle"></i> Add Fee Structure</a>
+                <a href="{% url 'fees:parent_result_access' %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-shield-lock"></i> Parent Result Access</a>
+                {% endif %}
+                <a href="{% url 'fees:record_payment' %}" class="btn btn-sm btn-success"><i class="bi bi-cash-coin"></i> Record Payment</a>
+                <a href="{% url 'fees:payment_list' %}" class="btn btn-sm btn-outline-info"><i class="bi bi-credit-card"></i> All Payments</a>
+                <a href="{% url 'fees:collection_report' %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-bar-chart"></i> Collection Report</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

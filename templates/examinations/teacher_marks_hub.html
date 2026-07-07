@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block page_title %}My Subjects &amp; Marks{% endblock %}
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h1 class="h3 fw-bold"><i class="bi bi-pencil-square"></i> My Subjects &amp; Marks</h1>
+    <p class="mb-0 opacity-75">Enter and edit marks only for subjects assigned to you</p>
+</div>
+
+{% if assignments %}
+<div class="row g-3 mb-4">
+    {% for item in assignments %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-primary mb-1"><i class="bi bi-journal-bookmark"></i> {{ item.subject.name }}</h6>
+                <p class="text-muted small mb-2">{{ item.class_room }}</p>
+                <span class="badge bg-light text-dark border">{{ item.subject.code }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-warning">No subjects assigned yet. Contact the head teacher or admin.</div>
+{% endif %}
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <select name="subject" class="form-select form-select-sm">
+            <option value="">All my subjects</option>
+            {% for s in subjects %}
+            <option value="{{ s.id }}" {% if selected_subject == s.id|stringformat:"s" %}selected{% endif %}>{{ s.name }} ({{ s.class_room }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="class" class="form-select form-select-sm">
+            <option value="">All classes</option>
+            {% for c in classes %}
+            <option value="{{ c.id }}" {% if selected_class == c.id|stringformat:"s" %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="term" class="form-select form-select-sm">
+            <option value="">All terms</option>
+            {% for t in terms %}
+            <option value="{{ t.id }}" {% if selected_term == t.id|stringformat:"s" %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-outline-primary btn-sm w-100"><i class="bi bi-funnel"></i> Filter</button>
+    </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-light fw-semibold"><i class="bi bi-clipboard-check"></i> Exams &amp; Mark Entry</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Exam</th>
+                        <th>Subject</th>
+                        <th>Class</th>
+                        <th>Term</th>
+                        <th>Progress</th>
+                        <th>Average</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in exam_rows %}
+                    <tr>
+                        <td>
+                            <strong>{{ row.exam.name }}</strong>
+                            <div class="small text-muted">Max {{ row.exam.max_marks }} marks</div>
+                        </td>
+                        <td>{{ row.exam.subject.name }}</td>
+                        <td>{{ row.exam.class_room }}</td>
+                        <td>{{ row.exam.term }}</td>
+                        <td>
+                            <span class="badge bg-{% if row.complete %}success{% elif row.entered %}warning text-dark{% else %}secondary{% endif %}">
+                                {{ row.entered }}/{{ row.class_size }} entered
+                            </span>
+                        </td>
+                        <td>{% if row.avg %}{{ row.avg }}{% else %}—{% endif %}</td>
+                        <td>
+                            <a href="{% url 'examinations:teacher_enter_marks' row.exam.id %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-pencil"></i> {% if row.entered %}Edit{% else %}Enter{% endif %} Marks
+                            </a>
+                            <a href="{% url 'examinations:teacher_result_detail' row.exam.id %}" class="btn btn-sm btn-outline-info">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center text-muted py-4">No exams for your subjects. Run demo data or ask admin to create exams.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

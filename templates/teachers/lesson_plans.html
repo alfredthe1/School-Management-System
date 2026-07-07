@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block page_title %}My Lesson Plans{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h1 class="h3 fw-bold">Lesson Plans</h1>
+    <p class="mb-0 opacity-75">Plan and document your teaching for {{ teacher.user.get_full_name|default:teacher.user.username }}</p>
+</div>
+
+<div class="row">
+    <!-- Form -->
+    <div class="col-lg-5">
+        <div class="card mb-4">
+            <div class="card-header">Create New Lesson Plan</div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary mt-2">Save Lesson Plan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- List -->
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header">Recent Lesson Plans</div>
+            <div class="card-body p-0">
+                {% if plans %}
+                <table class="table table-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Subject / Class</th>
+                            <th>Topic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for plan in plans %}
+                        <tr>
+                            <td>{{ plan.date }}</td>
+                            <td>{{ plan.subject.name }}<br><small class="text-muted">{{ plan.class_room }}</small></td>
+                            <td>{{ plan.topic }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="p-4 text-muted">No lesson plans yet. Create your first one.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<a href="{% url 'core:dashboard' %}" class="btn btn-link mt-3">← Back to Dashboard</a>
+{% endblock %}

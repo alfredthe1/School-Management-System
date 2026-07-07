@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block page_title %}Timetable Grid{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h1 class="h3 fw-bold">Visual Timetable Grid</h1>
+    <p class="mb-0">Per class view with conflict prevention</p>
+</div>
+
+<form method="get" class="mb-3">
+    <label>Class: </label>
+    <select name="class" onchange="this.form.submit()">
+        <option value="">All Classes</option>
+        {% for cls in classes %}
+        <option value="{{ cls.id }}" {% if selected_class == cls.id|stringformat:"s" %}selected{% endif %}>{{ cls }}</option>
+        {% endfor %}
+    </select>
+    <a href="{% url 'academics:create_timetable' %}" class="btn btn-primary btn-sm ms-3">+ Add Entry</a>
+</form>
+
+{% if rows %}
+<table class="table table-bordered timetable-grid table-sm">
+    <thead class="table-light">
+        <tr>
+            <th>Time Slot</th>
+            {% for day in days %}
+            <th class="text-center">{{ day }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+        <tr>
+            <td><strong>{{ row.time_slot.start_time }} - {{ row.time_slot.end_time }}</strong></td>
+            {% for day in days %}
+            <td class="text-center align-top" style="min-width:110px;">
+                {% with entry=row.entries.day %}
+                {% if entry %}
+                    <div class="small bg-light p-1 rounded border">
+                        <strong>{{ entry.subject.name }}</strong><br>
+                        <small class="text-muted">{{ entry.class_room }}<br>by {{ entry.teacher }}</small><br>
+                        <a href="{% url 'academics:edit_timetable' entry.pk %}" class="btn btn-link btn-sm p-0">Edit</a>
+                    </div>
+                {% else %}
+                    <span class="text-muted small">-</span>
+                {% endif %}
+                {% endwith %}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="alert alert-info">No timetable entries found.</div>
+{% endif %}
+
+<style>
+.timetable-grid td { vertical-align: top; font-size: 0.75rem; }
+</style>
+.timetable-cell { font-size: 0.8rem; }
+</style>
+
+{% endblock %}

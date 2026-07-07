@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="bi bi-{% if edit %}pencil{% else %}plus-circle{% endif %}"></i> {% if edit %}Edit{% else %}Add{% endif %} Payment</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary">Save Payment</button>
+                    <a href="{% url 'fees:student_fees' student.id %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

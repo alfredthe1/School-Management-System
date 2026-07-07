@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block page_title %}Exam Results{% endblock %}
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h1 class="h3 fw-bold">{{ exam.name }} — {{ exam.subject.name }}</h1>
+    <p class="mb-0 opacity-75">{{ exam.class_room }} • {{ exam.term }} • Max: {{ exam.max_marks }} marks</p>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="card"><div class="card-body text-center">
+            <h6 class="text-muted">Students Marked</h6>
+            <h3>{{ total_students }}</h3>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card"><div class="card-body text-center">
+            <h6 class="text-muted">Class Average</h6>
+            <h3>{% if avg_score %}{{ avg_score }}%{% else %}—{% endif %}</h3>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card"><div class="card-body text-center">
+            <h6 class="text-muted">Status</h6>
+            <h3>{% if exam.is_published %}<span class="badge bg-success">Published</span>{% else %}<span class="badge bg-secondary">Draft</span>{% endif %}</h3>
+        </div></div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 datatable">
+                <thead>
+                    <tr><th>#</th><th>Student</th><th>Marks</th><th>Grade</th><th>Remarks</th></tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ result.student.get_full_name }}</td>
+                        <td>{{ result.marks_obtained }} / {{ exam.max_marks }}</td>
+                        <td><span class="badge bg-primary">{{ result.grade }}</span></td>
+                        <td>{{ result.remarks|default:"—" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted py-4">No results recorded yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="mt-3 d-flex gap-2 flex-wrap">
+    {% if can_edit %}
+    <a href="{% url 'examinations:teacher_enter_marks' exam.id %}" class="btn btn-primary"><i class="bi bi-pencil"></i> Edit Marks</a>
+    {% endif %}
+    {% if user.role == 'teacher' %}
+    <a href="{% url 'examinations:teacher_marks_hub' %}" class="btn btn-secondary">Back to My Subjects</a>
+    {% else %}
+    <a href="{% url 'examinations:teacher_view_results' %}" class="btn btn-secondary">Back</a>
+    {% endif %}
+</div>
+{% endblock %}

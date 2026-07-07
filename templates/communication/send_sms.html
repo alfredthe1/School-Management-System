@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block page_title %}Send SMS{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-chat-dots"></i> Send Bulk SMS</div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Recipient Role</label>
+                        <select name="role" class="form-select" required>
+                            {% for value, label in roles %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Message</label>
+                        <textarea name="message" class="form-control" rows="4" required maxlength="160"></textarea>
+                        <small class="text-muted">Max 160 characters per SMS</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send SMS</button>
+                    <a href="{% url 'communication:bulk_communication' %}" class="btn btn-outline-secondary">Bulk SMS + Email</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

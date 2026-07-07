@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block page_title %}Class Timetable{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h1 class="h3 fw-bold">Class Timetable</h1>
+    <p class="mb-0 opacity-75">View your teaching schedule</p>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if entries %}
+        <table class="table table-hover professional-table">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Class</th>
+                    <th>Subject</th>
+                    <th>Term</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                <tr>
+                    <td><strong>{{ entry.time_slot.get_day_display }}</strong></td>
+                    <td>{{ entry.time_slot.start_time }} - {{ entry.time_slot.end_time }}</td>
+                    <td>{{ entry.class_room }}</td>
+                    <td>{{ entry.subject }}</td>
+                    <td>{{ entry.term }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-info">No timetable entries found for you yet.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block page_title %}Manage Landing Page Images{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h1 class="h3 mb-1 fw-bold">Landing Page Images</h1>
+    <p class="mb-0 opacity-75">Upload images that will appear in the public school website gallery and hero.</p>
+</div>
+
+<div class="row">
+    <!-- Upload Form -->
+    <div class="col-lg-5">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <strong>Upload New Image</strong>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary mt-2">Upload Image</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Images -->
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header">
+                <strong>Current Landing Images ({{ images.count }})</strong>
+            </div>
+            <div class="card-body">
+                {% if images %}
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Preview</th>
+                                <th>Title / Caption</th>
+                                <th>Order</th>
+                                <th>Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for img in images %}
+                            <tr>
+                                <td>
+                                    <img src="{{ img.image.url }}" alt="{{ img.title }}" style="width:80px; height:60px; object-fit:cover; border-radius:4px;">
+                                </td>
+                                <td>
+                                    <strong>{{ img.title|default:"Untitled" }}</strong><br>
+                                    <small class="text-muted">{{ img.caption|truncatechars:40 }}</small>
+                                </td>
+                                <td>{{ img.order }}</td>
+                                <td>
+                                    {% if img.is_active %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="post" action="{% url 'core:delete_landing_image' img.pk %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove this image?')">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No images uploaded yet. Add some to beautify the landing page.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info mt-4">
+    <strong>Note:</strong> These images will be displayed in the public landing page gallery. Keep them high quality (recommended 1200x800px or similar).
+</div>
+{% endblock %}

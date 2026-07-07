@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #1E3A5F, #2C7BB6);">
+                <h4 class="mb-0"><i class="bi bi-building-add"></i> {{ title }}</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Class Name</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Stream</label>
+                            {{ form.section }}
+                            <small class="text-muted">e.g. A, B, East — leave blank for a single stream</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Academic Year</label>
+                            {{ form.academic_year }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Capacity</label>
+                            {{ form.capacity }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-medium">Class Teacher</label>
+                            {{ form.class_teacher }}
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Save</button>
+                        <a href="{% url 'core:class_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

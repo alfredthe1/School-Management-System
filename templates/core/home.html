@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Happy Child Nursery & Primary School | Arua, Uganda{% endblock %}
+
+{% block content %}
+<!-- Professional Simple Landing Page - Sky Blue Theme -->
+<!-- HERO -->
+<section class="py-5" style="background: linear-gradient(135deg, #2C7BB6 0%, #4AA3DF 100%); color: white; min-height: 90vh; display: flex; align-items: center;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="mb-3">
+                    <span class="badge bg-white text-dark px-3 py-2" style="font-size: 0.85rem; letter-spacing: 1px;">EST. 2020 • ARUA, UGANDA</span>
+                </div>
+                <h1 class="display-4 fw-bold mb-3" style="line-height: 1.05; font-family: 'Poppins', sans-serif;">
+                    Nurturing Young Minds.<br>
+                    <span style="color: #F4A460;">Building Future Leaders.</span>
+                </h1>
+                <p class="lead mb-4" style="max-width: 540px; opacity: 0.92; font-size: 1.15rem;">
+                    Educating the child to be a self reliant and God fearing citizen
+                    in a contemporary world.
+                    
+                    Empowering children with knowledge, values, and skills for a brighter tomorrow.
+                </p>
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <a href="#programs" class="btn btn-light btn-lg px-5 py-3 fw-semibold">Explore Programs</a>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg px-5 py-3">Parent / Staff Login</a>
+                </div>
+                <div class="d-flex align-items-center gap-4 text-white-50 small">
+                    <div><i class="bi bi-geo-alt-fill me-1"></i> Arua, West Nile Region, Uganda</div>
+                    <div><i class="bi bi-telephone-fill me-1"></i> +256 777 456 751/+256 774 324 732</div>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block">
+                {% if landing_images %}
+                    <img src="{{ landing_images.0.image.url }}" class="img-fluid rounded-4 shadow-lg" alt="Happy Child School Campus" style="max-height: 440px; object-fit: cover; border: 8px solid rgba(255,255,255,0.25);">
+                {% else %}
+                    <img src="https://picsum.photos/id/1015/600/520" class="img-fluid rounded-4 shadow-lg" alt="School Campus" style="max-height: 440px; object-fit: cover; border: 8px solid rgba(255,255,255,0.25);">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ABOUT US -->
+<section id="about" class="py-5 bg-white">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h2 class="h1 fw-bold mb-4" style="color: #1E3A5F;">About Happy Child School</h2>
+                <p class="lead text-muted">Located in the vibrant town of Arua in Uganda's West Nile Region, Happy Child Nursery and Primary School has been a beacon of quality education since 2010.</p>
+                <p>We provide a safe, inclusive, and stimulating environment that nurtures academic excellence, character development, and holistic growth for every child.</p>
+                <div class="mt-4">
+                    <div class="d-flex gap-4">
+                        <div>
+                            <div class="fw-bold fs-3" style="color:#4AA3DF;">500+</div>
+                            <div class="small text-muted">Students</div>
+                        </div>
+                        <div>
+                            <div class="fw-bold fs-3" style="color:#4AA3DF;">35+</div>
+                            <div class="small text-muted">Dedicated Teachers</div>
+                        </div>
+                        <div>
+                            <div class="fw-bold fs-3" style="color:#4AA3DF;">15</div>
+                            <div class="small text-muted">Years of Excellence</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="bg-light p-4 rounded-3" style="border-left: 5px solid #4AA3DF;">
+                    <h5 class="fw-semibold mb-3">Our Commitment</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Child-centered learning</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Strong moral and religious values</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Modern facilities and qualified staff</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Focus on Ugandan curriculum + life skills</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PROGRAMS -->
+<section id="programs" class="py-5" style="background-color: #f0f8ff;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="h1 fw-bold" style="color: #1E3A5F;">Our Programs</h2>
+            <p class="text-muted">From early childhood to primary education, tailored for the children of Arua and West Nile.</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="mb-3"><i class="bi bi-mortarboard display-5" style="color:#4AA3DF;"></i></div>
+                        <h4 class="fw-semibold">Nursery Section</h4>
+                        <p class="text-muted">Play-based learning for ages 3-6. Focus on social skills, early literacy, numeracy, and creative play in a caring environment.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="mb-3"><i class="bi bi-book display-5" style="color:#4AA3DF;"></i></div>
+                        <h4 class="fw-semibold">Primary Section (P1–P7)</h4>
+                        <p class="text-muted">Comprehensive Ugandan curriculum with strong emphasis on Mathematics, English, Science, Social Studies, and co-curricular activities.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="mb-3"><i class="bi bi-people display-5" style="color:#4AA3DF;"></i></div>
+                        <h4 class="fw-semibold">Co-curricular &amp; Clubs</h4>
+                        <p class="text-muted">Sports, Music, Drama, Debate, Agriculture, and ICT clubs to develop well-rounded, confident children.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- LOCATION -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h2 class="h1 fw-bold mb-4" style="color: #1E3A5F;">Visit Us in Arua</h2>
+                <p class="lead">We are proudly located in Arua, the heart of West Nile Region, Uganda.</p>
+                <ul class="list-unstyled mt-4">
+                    <li class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i> <strong>Address:</strong> Plot 45, Arua Town, West Nile, Uganda</li>
+                    <li class="mb-2"><i class="bi bi-telephone text-primary me-2"></i> <strong>Phone:</strong> +256 700 123 456</li>
+                    <li class="mb-2"><i class="bi bi-envelope text-primary me-2"></i> <strong>Email:</strong> info@happychildarua.ac.ug</li>
+                    <li><i class="bi bi-clock text-primary me-2"></i> <strong>Office Hours:</strong> Mon–Fri 7:30am – 5:00pm</li>
+                </ul>
+                <a href="{% url 'accounts:login' %}" class="btn btn-primary mt-3">Contact Admissions</a>
+            </div>
+            <div class="col-lg-6">
+                <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow">
+                    <img src="https://picsum.photos/id/1016/800/500" class="w-100 h-100 object-fit-cover" alt="Arua, West Nile landscape">
+                </div>
+                <p class="small text-muted mt-2 text-center">Beautiful West Nile Region – our home</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- GALLERY -->
+<section class="py-5" style="background-color: #f0f8ff;">
+    <div class="container">
+        <h2 class="h1 fw-bold text-center mb-5" style="color: #1E3A5F;">Life at Happy Child</h2>
+        <div class="row g-3">
+            {% for img in landing_images %}
+            <div class="col-6 col-md-3">
+                <div class="ratio ratio-1x1 rounded-3 overflow-hidden shadow-sm">
+                    <img src="{{ img.image.url }}" class="w-100 h-100 object-fit-cover" alt="{{ img.title }}">
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-6 col-md-3"><img src="https://picsum.photos/id/1005/400/300" class="img-fluid rounded-3 shadow-sm" alt="Classroom"></div>
+            <div class="col-6 col-md-3"><img src="https://picsum.photos/id/1018/400/300" class="img-fluid rounded-3 shadow-sm" alt="Students"></div>
+            <div class="col-6 col-md-3"><img src="https://picsum.photos/id/160/400/300" class="img-fluid rounded-3 shadow-sm" alt="Playground"></div>
+            <div class="col-6 col-md-3"><img src="https://picsum.photos/id/251/400/300" class="img-fluid rounded-3 shadow-sm" alt="Activities"></div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="py-5 text-center" style="background: #2C7BB6; color: white;">
+    <div class="container">
+        <h2 class="fw-bold mb-3">Ready to Join Our Family?</h2>
+        <p class="lead mb-4 opacity-90">Admissions are open for the new term in Arua, West Nile.</p>
+        <a href="{% url 'accounts:login' %}" class="btn btn-light btn-lg px-5 fw-semibold">Login to Portal</a>
+    </div>
+</section>
+
+<!-- ABOUT US -->
+<section id="about" class="py-5 bg-white">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h2 class="h1 fw-bold mb-4" style="color: #1E3A5F;">About Happy Child School</h2>
+                <p class="lead text-muted">Located in the vibrant town of Arua in Uganda's West Nile Region, Happy Child Nursery and Primary School has been a beacon of quality education since 2010.</p>
+                <p>We provide a safe, inclusive, and stimulating environment that nurtures academic excellence, character development, and holistic growth for every child.</p>
+            </div>
+            <div class="col-lg-6">
+                <div class="bg-light p-4 rounded-3" style="border-left: 5px solid #4AA3DF;">
+                    <h5 class="fw-semibold mb-3">Our Commitment</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Child-centered learning</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Strong moral and religious values</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Modern facilities and qualified staff</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Focus on Ugandan curriculum + life skills</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PROGRAMS -->
+<section id="programs" class="py-5" style="background-color: #f0f8ff;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="h1 fw-bold" style="color: #1E3A5F;">Our Programs</h2>
+            <p class="text-muted">From early childhood to primary education, tailored for the children of Arua and West Nile.</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 h-100 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="mb-3"><i class="bi bi-mortarboard display-5" style="color:#4AA3DF;"></i></div>
+                        <h4 class="fw-semibold">Nursery Section</h4>
+                        <p class="text-muted">Play-based learning for ages 3-6. Focus on social skills, early literacy, numeracy, and creative play in a caring environment.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 h-100 shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="fw-semibold">Primary Section (P1–P7)</h4>
+                        <p class="text-muted">Comprehensive Ugandan curriculum with strong emphasis on Mathematics, English, Science, Social Studies, and co-curricular activities.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 h-100 shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="fw-semibold">After School</h4>
+                        <p class="text-muted">Sports, Music, Drama, Debate, Agriculture, and ICT clubs to develop well-rounded, confident children.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- LOCATION -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h2 class="h1 fw-bold mb-4" style="color: #1E3A5F;">Visit Us in Arua</h2>
+                <p class="lead">We are proudly located in Arua, the heart of West Nile Region, Uganda.</p>
+                <ul class="list-unstyled mt-4">
+                    <li class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i> <strong>Address:</strong> Plot 45, Arua Town, West Nile, Uganda</li>
+                    <li class="mb-2"><i class="bi bi-telephone text-primary me-2"></i> <strong>Phone:</strong> +256 700 123 456</li>
+                    <li class="mb-2"><i class="bi bi-envelope text-primary me-2"></i> <strong>Email:</strong> info@happychildarua.ac.ug</li>
+                    <li><i class="bi bi-clock text-primary me-2"></i> <strong>Office Hours:</strong> Mon–Fri 7:30am – 5:00pm</li>
+                </ul>
+                <a href="{% url 'accounts:login' %}" class="btn btn-primary mt-3">Contact Admissions</a>
+            </div>
+            <div class="col-lg-6">
+                <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow">
+                    <img src="https://picsum.photos/id/1016/800/500" class="w-100 h-100 object-fit-cover" alt="Arua, West Nile landscape">
+                </div>
+                <p class="small text-muted mt-2 text-center">Beautiful West Nile Region – our home</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- GALLERY (DYNAMIC) -->
+<section class="py-5" style="background-color: #f0f8ff;">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="h1 fw-bold" style="color: #1E3A5F;">Life at Happy Child</h2>
+        </div>
+        <div class="row g-3">
+            {% for img in landing_images %}
+            <div class="col-6 col-md-3">
+                <div class="ratio ratio-16x9 rounded-3 overflow-hidden shadow-sm">
+                    <img src="{{ img.image.url }}" alt="{{ img.title }}" class="w-100 h-100 object-fit-cover">
+                </div>
+            </div>
+            {% empty %}
+                <div class="col-6 col-md-3"><img src="https://picsum.photos/id/1015/600/400" class="img-fluid rounded-3 shadow-sm" alt=""></div>
+                <div class="col-6 col-md-3"><img src="https://picsum.photos/id/160/600/400" class="img-fluid rounded-3 shadow-sm" alt=""></div>
+                <div class="col-6 col-md-3"><img src="https://picsum.photos/id/251/600/400" class="img-fluid rounded-3 shadow-sm" alt=""></div>
+                <div class="col-6 col-md-3"><img src="https://picsum.photos/id/201/600/400" class="img-fluid rounded-3 shadow-sm" alt=""></div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="py-5 text-center" style="background: #2C7BB6; color: white;">
+    <div class="container">
+        <h2 class="fw-bold mb-3">Ready to Join Our Family?</h2>
+        <p class="lead mb-4 opacity-90">Admissions are open for the new term in Arua, West Nile.</p>
+        <a href="{% url 'accounts:login' %}" class="btn btn-light btn-lg px-5 fw-semibold">Login to Portal</a>
+    </div>
+</section>
+{% endblock %}

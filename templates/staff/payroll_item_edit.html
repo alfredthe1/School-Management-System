@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block page_title %}Edit Payroll Item{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow">
+            <div class="card-header bg-warning">
+                <h6 class="mb-0">Edit — {{ item.staff.get_full_name }}</h6>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted">
+                    Base: UGX {{ item.base_salary|floatformat:0 }} +
+                    Allowances: UGX {{ item.total_allowances|floatformat:0 }}
+                </p>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a href="{% url 'staff:payroll_detail' item.payroll_run.pk %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block page_title %}Allowances — {{ staff.get_full_name }}{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="bi bi-plus-circle"></i> Add Allowance</h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary">Add Allowance</button>
+                </form>
+            </div>
+        </div>
+        <div class="card border-0 shadow-sm mt-3">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Monthly Breakdown</h6>
+                <p class="mb-1">Base: <strong>UGX {{ staff.base_salary|floatformat:0 }}</strong></p>
+                <p class="mb-1">Allowances: <strong>UGX {{ monthly_total|floatformat:0 }}</strong></p>
+                <hr>
+                <h4 class="text-success">UGX {{ projected_pay|floatformat:0 }}</h4>
+                <small class="text-muted">Total Monthly Pay</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Allowances for {{ staff.get_full_name }}</h6>
+                <a href="{% url 'staff:detail' staff.pk %}" class="btn btn-sm btn-outline-secondary">Back</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>Name</th><th>Amount</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        {% for a in allowances %}
+                        <tr>
+                            <td>{{ a.name }}</td>
+                            <td>UGX {{ a.amount|floatformat:0 }}</td>
+                            <td>{{ a.description|default:"—" }}</td>
+                            <td>{% if a.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Off</span>{% endif %}</td>
+                            <td>
+                                <a href="{% url 'staff:toggle_allowance' staff.pk a.pk %}" class="btn btn-sm btn-outline-warning">Toggle</a>
+                                <form method="post" action="{% url 'staff:delete_allowance' staff.pk a.pk %}" class="d-inline"
+                                      data-swal-delete data-swal-title="Delete allowance?">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center text-muted py-4">No allowances yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

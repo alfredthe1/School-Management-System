@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block page_title %}Teacher Assignments{% endblock %}
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #1E3A5F, #2C7BB6);">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h4 class="mb-0"><i class="bi bi-person-check"></i> Subject &amp; Teacher Assignments</h4>
+            <a href="{% url 'core:class_list' %}" class="btn btn-light btn-sm"><i class="bi bi-building"></i> Classes</a>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        {% if unassigned_count %}
+        <div class="alert alert-warning d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <span><strong>{{ unassigned_count }}</strong> subject(s) still need a teacher this academic year.</span>
+        </div>
+        {% endif %}
+
+        <form method="get" class="row g-2 mb-4">
+            <div class="col-md-6">
+                <label class="form-label fw-medium"><i class="bi bi-building"></i> Select Class &amp; Stream</label>
+                <select name="class" class="form-select" onchange="this.form.submit()">
+                    <option value="">— Choose a class —</option>
+                    {% for c in classes %}
+                    <option value="{{ c.id }}" {% if classroom and classroom.id == c.id %}selected{% endif %}>{{ c.display_name }} ({{ c.academic_year.name }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+        {% if classroom and form %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="class_room" value="{{ classroom.pk }}">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th><i class="bi bi-book"></i> Subject</th>
+                            <th><i class="bi bi-person-badge"></i> Assign Teacher</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for field in form %}
+                        <tr>
+                            <td class="fw-medium"><i class="bi bi-journal-text text-primary"></i> {{ field.label }}</td>
+                            <td>{{ field }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="2" class="text-muted">No subjects in this class. <a href="{% url 'core:subject_create' %}?class={{ classroom.pk }}">Add subjects</a>.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if subjects %}
+            <button type="submit" class="btn btn-primary mt-3"><i class="bi bi-check2-all"></i> Save Assignments</button>
+            {% endif %}
+        </form>
+        {% elif not classroom %}
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-arrow-up-circle display-4"></i>
+            <p class="mt-2">Select a class above to assign teachers to its subjects.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

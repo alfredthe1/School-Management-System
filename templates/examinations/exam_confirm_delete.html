@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block page_title %}Delete Exam{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">Confirm Delete</div>
+            <div class="card-body">
+                <p>Are you sure you want to delete <strong>{{ object.name }}</strong> ({{ object.subject.name }})?</p>
+                <p class="text-muted small">All marks entered for this exam will also be deleted.</p>
+                <form method="post" class="swal-confirm-form"
+                      data-swal-title="Delete {{ object.name }}?"
+                      data-swal-text="All marks for this exam will also be deleted.">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    <a href="{% url 'examinations:exam_list' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

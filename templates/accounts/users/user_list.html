@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block page_title %}System Users{% endblock %}
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #1E3A5F, #2C7BB6);">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h4 class="mb-0"><i class="bi bi-people-fill"></i> System Users</h4>
+                <small class="opacity-75">{{ active_users }} active of {{ total_users }} accounts</small>
+            </div>
+            <a href="{% url 'accounts:user_create' %}" class="btn btn-success btn-sm"><i class="bi bi-person-plus-fill"></i> Add User</a>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="row g-2 mb-4">
+            {% for role_key, role_label in roles %}
+            <div class="col-6 col-md-4 col-xl">
+                <a href="?role={{ role_key }}" class="text-decoration-none">
+                    <div class="card stat-card h-100 {% if selected_role == role_key %}border-primary border-2{% endif %}">
+                        <div class="card-body py-2 px-3 d-flex align-items-center gap-2">
+                            <i class="bi {% for k,v in role_icons.items %}{% if k == role_key %}{{ v }}{% endif %}{% endfor %} text-primary fs-5"></i>
+                            <div>
+                                <small class="text-muted d-block">{{ role_label }}</small>
+                                <strong>{% for k,v in role_counts.items %}{% if k == role_key %}{{ v }}{% endif %}{% endfor %}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" placeholder="Search name, username, email, phone..." value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <select name="role" class="form-select">
+                    <option value="">All roles</option>
+                    {% for role_key, role_label in roles %}
+                    <option value="{{ role_key }}" {% if selected_role == role_key %}selected{% endif %}>{{ role_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All statuses</option>
+                    <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active only</option>
+                    <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>Inactive only</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Filter</button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle datatable">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Contact</th>
+                        <th>Status</th>
+                        <th>Last login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="{% if u.profile_pic %}{{ u.profile_pic.url }}{% else %}https://ui-avatars.com/api/?name={{ u.username }}&background=4AA3DF&color=fff&size=36{% endif %}"
+                                     class="rounded-circle" width="36" height="36" alt="">
+                                <div>
+                                    <strong>{{ u.get_full_name|default:u.username }}</strong>
+                                    <div class="small text-muted">@{{ u.username }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">
+                                {% for k,v in role_icons.items %}{% if k == u.role %}<i class="bi {{ v }}"></i>{% endif %}{% endfor %}
+                                {{ u.get_role_display }}
+                            </span>
+                        </td>
+                        <td class="small">
+                            {% if u.email %}<div><i class="bi bi-envelope"></i> {{ u.email }}</div>{% endif %}
+                            {% if u.phone %}<div><i class="bi bi-phone"></i> {{ u.phone }}</div>{% endif %}
+                        </td>
+                        <td>
+                            {% if u.is_active %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Active</span>
+                            {% else %}
+                            <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="small text-muted">
+                            {% if u.last_login %}{{ u.last_login|date:"M d, Y H:i" }}{% else %}Never{% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'accounts:user_detail' u.pk %}" class="btn btn-outline-primary" title="View"><i class="bi bi-eye"></i></a>
+                                <a href="{% url 'accounts:user_edit' u.pk %}" class="btn btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'accounts:user_permissions' u.pk %}" class="btn btn-outline-info" title="Portal permissions"><i class="bi bi-sliders"></i></a>
+                                <a href="{% url 'accounts:user_reset_password' u.pk %}" class="btn btn-outline-warning" title="Reset password"><i class="bi bi-key"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center text-muted py-4">No users match your filters.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

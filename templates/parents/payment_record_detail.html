@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block page_title %}Payment Receipt{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <a href="{% url 'parents:payment_history' %}" class="btn btn-link text-decoration-none mb-3"><i class="bi bi-arrow-left"></i> Payment history</a>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #1E3A5F, #2C7BB6);">
+                <h4 class="mb-0"><i class="bi bi-receipt-cutoff"></i> Payment Receipt</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="text-center mb-4 pb-3 border-bottom">
+                    <p class="text-muted small mb-1">{{ school_name }}</p>
+                    <h2 class="fw-bold text-success mb-0">UGX {{ payment.amount_paid|floatformat:0 }}</h2>
+                    <span class="badge bg-success mt-2"><i class="bi bi-check-circle-fill"></i> Paid</span>
+                </div>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Receipt No.</dt>
+                    <dd class="col-sm-8"><code>{{ payment.receipt_number }}</code></dd>
+                    <dt class="col-sm-4">Student</dt>
+                    <dd class="col-sm-8">{{ payment.student.get_full_name }} ({{ payment.student.student_id }})</dd>
+                    <dt class="col-sm-4">Class</dt>
+                    <dd class="col-sm-8">{{ payment.student.current_class }}</dd>
+                    <dt class="col-sm-4">Fee item</dt>
+                    <dd class="col-sm-8">{{ payment.fee_structure.name|default:"General fees" }}</dd>
+                    <dt class="col-sm-4">Payment method</dt>
+                    <dd class="col-sm-8">{{ payment.get_payment_method_display }}</dd>
+                    <dt class="col-sm-4">Date paid</dt>
+                    <dd class="col-sm-8">{{ payment.date_paid|date:"l, F j, Y" }}</dd>
+                    {% if mm_txn %}
+                    <dt class="col-sm-4">Mobile ref</dt>
+                    <dd class="col-sm-8">{{ mm_txn.transaction_reference|default:mm_txn.reference_id }}</dd>
+                    <dt class="col-sm-4">Phone used</dt>
+                    <dd class="col-sm-8">{{ mm_txn.phone_number }}</dd>
+                    {% endif %}
+                    {% if payment.remarks %}
+                    <dt class="col-sm-4">Remarks</dt>
+                    <dd class="col-sm-8">{{ payment.remarks }}</dd>
+                    {% endif %}
+                </dl>
+                <div class="mt-4 d-flex gap-2">
+                    <a href="{% url 'parents:pay_fees' payment.student.id %}" class="btn btn-primary"><i class="bi bi-wallet2"></i> Pay more fees</a>
+                    <a href="{% url 'parents:child_progress' payment.student.id %}" class="btn btn-outline-secondary">Child progress</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

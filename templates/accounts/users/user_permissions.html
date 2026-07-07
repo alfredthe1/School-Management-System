@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block page_title %}Portal Permissions — {{ user_obj.username }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h2 class="h4 fw-bold mb-1"><i class="bi bi-sliders"></i> Portal Permissions</h2>
+        <p class="text-muted mb-0">{{ user_obj.get_full_name|default:user_obj.username }} &bull; {{ user_obj.get_role_display }}</p>
+    </div>
+    <a href="{% url 'accounts:user_detail' user_obj.pk %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back to user</a>
+</div>
+
+<div class="alert alert-info d-flex gap-2 align-items-start">
+    <i class="bi bi-info-circle-fill fs-5"></i>
+    <div class="small">Control exactly what appears in this user's sidebar and portal. Overrides apply on top of their role defaults.</div>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="row g-3 mb-4">
+        {% for section in category_sections %}
+        <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-light fw-semibold">{{ section.label }}</div>
+                <div class="card-body">
+                    {% for mod in section.modules %}
+                    <div class="form-check form-switch mb-2 py-1 border-bottom">
+                        {{ mod.field }}
+                        <label class="form-check-label" for="{{ mod.field.id_for_label }}">
+                            <i class="bi {{ mod.icon }} text-primary"></i> {{ mod.label }}
+                            {% if mod.role_default %}
+                            <span class="badge bg-light text-muted border ms-1">role default</span>
+                            {% endif %}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-primary"><i class="bi bi-check2-all"></i> Save Permissions</button>
+    <a href="{% url 'accounts:user_detail' user_obj.pk %}" class="btn btn-outline-secondary">Cancel</a>
+</form>
+{% endblock %}

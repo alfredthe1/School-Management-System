@@ -1,0 +1,33 @@
+# Local PostgreSQL for production-like development or small deployments.
+# Usage: docker compose up -d
+# Then set in .env: DJANGO_ENV=production, POSTGRES_HOST=localhost, etc.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: happy_child_school
+      POSTGRES_USER: happy_child
+      POSTGRES_PASSWORD: change_me_in_production
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U happy_child -d happy_child_school"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:

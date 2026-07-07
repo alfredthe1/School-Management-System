@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block page_title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h1 class="h3 mb-1 fw-bold">Teacher Dashboard</h1>
+    <p class="mb-0 opacity-75">Welcome back, {{ user.get_full_name|default:user.username }} • Arua, West Nile</p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">My Subjects</div>
+                        <div class="h2 fw-bold mb-0">{{ subjects|length|default:3 }}</div>
+                    </div>
+                    <i class="bi bi-book display-6 text-primary"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Students</div>
+                        <div class="h2 fw-bold mb-0">{{ total_students_teacher|default:92 }}</div>
+                    </div>
+                    <i class="bi bi-people display-6 text-success"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Pending Marks</div>
+                        <div class="h2 fw-bold mb-0">12</div>
+                    </div>
+                    <i class="bi bi-clipboard-data display-6 text-warning"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Attendance Rate</div>
+                        <div class="h2 fw-bold mb-0">94%</div>
+                    </div>
+                    <i class="bi bi-calendar-check display-6 text-info"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Quick Marks -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <strong>📝 Quick Marks Entry (for my subjects)</strong>
+                <a href="{% url 'examinations:teacher_exam_list' %}" class="btn btn-sm btn-outline-primary">Full Entry</a>
+            </div>
+            <div class="card-body">
+                <div id="quick-marks-root"></div>
+                <small class="text-muted">Only for subjects you teach.</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><strong>📅 My Class Timetable</strong></div>
+            <div class="card-body">
+                <a href="{% url 'academics:timetable' %}" class="btn btn-outline-primary w-100 mb-2">View Timetable</a>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header"><strong>📝 Lesson Plans</strong></div>
+            <div class="card-body">
+                <a href="{% url 'core:teacher_lesson_plans' %}" class="btn btn-success w-100">Manage Lesson Plans</a>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header"><strong>📊 Class Results</strong></div>
+            <div class="card-body">
+                <a href="{% url 'academics:class_results' %}" class="btn btn-info w-100">View Class Results</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upcoming Events -->
+<div class="row mt-4" id="upcoming-events">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><strong>📅 Upcoming Events</strong></div>
+            <div class="card-body">
+                {% if upcoming_events %}
+                <ul class="list-unstyled mb-0">
+                    {% for ev in upcoming_events %}
+                    <li><strong>{{ ev.title }}</strong> - {{ ev.date|date:"M d" }} @ {{ ev.location|default:"TBA" }}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted mb-0">No upcoming events. Check back soon!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script>
+function QuickMarksApp() {
+  const [marks, setMarks] = React.useState({1: 85, 2: 72, 3: 91});
+  const students = [{id:1, name:'Amina K.'}, {id:2, name:'John O.'}, {id:3, name:'Fatima N.'}];
+
+  const updateMark = (id, val) => setMarks({...marks, [id]: val});
+
+  return React.createElement('div', {className: 'small'},
+    students.map(s => React.createElement('div', {key: s.id, className: 'd-flex mb-2 align-items-center'},
+      React.createElement('span', {className: 'flex-grow-1'}, s.name),
+      React.createElement('input', {
+        type: 'number', className: 'form-control form-control-sm w-25',
+        value: marks[s.id] || '', onChange: (e) => updateMark(s.id, e.target.value)
+      })
+    )),
+    React.createElement('button', {
+      className: 'btn btn-sm btn-primary mt-2',
+      onClick: () => alert('Quick marks saved (demo). Connect to backend for real save!')
+    }, 'Save Quick Marks')
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('quick-marks-root'));
+root.render(React.createElement(QuickMarksApp));
+</script>
+{% endblock %}

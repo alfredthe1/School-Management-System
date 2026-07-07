@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block page_title %}Payroll — {{ run.get_month_display }} {{ run.year }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h4 class="mb-1">{{ run.get_month_display }} {{ run.year }} Payroll</h4>
+        <span class="badge bg-{% if run.status == 'paid' %}success{% elif run.status == 'processed' %}primary{% else %}secondary{% endif %} fs-6">
+            {{ run.get_status_display }}
+        </span>
+    </div>
+    <div class="d-flex gap-2">
+        {% if run.status != 'paid' %}
+        <form method="post" action="{% url 'staff:mark_payroll_paid' run.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-circle"></i> Mark as Paid</button>
+        </form>
+        {% endif %}
+        <a href="{% url 'staff:payroll_dashboard' %}" class="btn btn-outline-secondary btn-sm">Back</a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <h6 class="text-muted">Staff</h6>
+                <h4>{{ items|length }}</h4>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-muted">Total Payroll</h6>
+                <h4 class="text-success">UGX {{ run.total_amount|floatformat:0 }}</h4>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-muted">Processed</h6>
+                <h6>{{ run.processed_at|date:"M d, Y H:i"|default:"—" }}</h6>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 datatable">
+            <thead>
+                <tr>
+                    <th>Staff</th>
+                    <th>Role</th>
+                    <th>Base Salary</th>
+                    <th>Allowances</th>
+                    <th>Deductions</th>
+                    <th>Net Pay</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <strong>{{ item.staff.get_full_name }}</strong><br>
+                        <small class="text-muted">{{ item.staff.employee_id }}</small>
+                    </td>
+                    <td>{{ item.staff.role_display }}</td>
+                    <td>UGX {{ item.base_salary|floatformat:0 }}</td>
+                    <td>
+                        UGX {{ item.total_allowances|floatformat:0 }}
+                        {% for line in item.allowance_lines.all %}
+                        <br><small class="text-muted">{{ line.name }}: {{ line.amount|floatformat:0 }}</small>
+                        {% endfor %}
+                    </td>
+                    <td>UGX {{ item.deductions|floatformat:0 }}</td>
+                    <td><strong class="text-success">UGX {{ item.net_pay|floatformat:0 }}</strong></td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'staff:edit_payroll_item' item.pk %}" class="btn btn-outline-warning" title="Edit deductions"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'staff:record_payment' item.staff.pk %}?item={{ item.pk }}" class="btn btn-outline-success" title="Pay"><i class="bi bi-cash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,5 @@
+{% if school_logo_url %}
+<img src="{{ school_logo_url }}" alt="{{ school_name }}" class="school-logo{% if logo_class %} {{ logo_class }}{% endif %}"{% if logo_height %} height="{{ logo_height }}"{% endif %}{% if logo_width %} width="{{ logo_width }}"{% endif %}>
+{% elif show_fallback %}
+<span class="school-logo-fallback{% if logo_class %} {{ logo_class }}{% endif %}">🏫</span>
+{% endif %}

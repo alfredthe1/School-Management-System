@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load role_tags %}
+{% block page_title %}Manage Exams{% endblock %}
+{% block content %}
+<div class="dashboard-header mb-4 d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="h3 fw-bold">Examinations</h1>
+        <p class="mb-0 opacity-75">Create and manage school exams</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'examinations:exam_add' %}" class="btn btn-light"><i class="bi bi-plus-lg"></i> New Exam</a>
+        <a href="{% url 'examinations:grade_scales' %}" class="btn btn-outline-light">Grade Scales</a>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 datatable" data-no-sort="6">
+                <thead>
+                    <tr>
+                        <th>Exam</th>
+                        <th>Subject</th>
+                        <th>Class</th>
+                        <th>Term</th>
+                        <th>Dates</th>
+                        <th>Published</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam in exams %}
+                    <tr>
+                        <td>{{ exam.name }}</td>
+                        <td>{{ exam.subject.name }}</td>
+                        <td>{{ exam.class_room }}</td>
+                        <td>{{ exam.term }}</td>
+                        <td>{{ exam.start_date }} – {{ exam.end_date }}</td>
+                        <td>{% if exam.is_published %}<span class="badge bg-success">Yes</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}</td>
+                        <td>
+                            <a href="{% url 'examinations:admin_enter_marks' exam.id %}" class="btn btn-sm btn-primary">Marks</a>
+                            <a href="{% url 'examinations:exam_results' exam.id %}" class="btn btn-sm btn-info">Results</a>
+                            <a href="{% url 'examinations:exam_edit' exam.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <a href="{% url 'examinations:exam_delete' exam.pk %}" class="btn btn-sm btn-outline-danger"
+                               data-swal-delete data-swal-title="Delete {{ exam.name }}?"
+                               data-swal-text="All marks for this exam will be deleted.">Delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center text-muted py-4">No exams created yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load role_tags %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="min-w-0">
+            <h1 class="h3 mb-1 fw-bold text-truncate">Welcome back, {{ user.get_full_name|default:user.username }} 👋</h1>
+            <p class="mb-0 opacity-75">Role: <strong>{{ user.get_role_display }}</strong> • {% now "l, F j" %}</p>
+        </div>
+        {% if current_year %}
+        <span class="badge bg-white text-dark px-3 py-2 flex-shrink-0">{{ current_year.name }}</span>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    {% if user|has_role:"admin,headteacher" %}
+    <div class="col-6 col-md-6 col-xl-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <h6 class="text-muted small">Total Students</h6>
+                <h3 class="fw-bold mb-0">{{ total_students }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-6 col-xl-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <h6 class="text-muted small">Total Teachers</h6>
+                <h3 class="fw-bold mb-0">{{ total_teachers }}</h3>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if user|has_role:"admin,headteacher,bursar" %}
+    <div class="col-6 col-md-6 col-xl-3">
+        <div class="card stat-card h-100 border-start border-warning">
+            <div class="card-body">
+                <h6 class="text-muted small">Fees Collected</h6>
+                <h3 class="fw-bold mb-0 text-break">UGX {{ total_collected|floatformat:0 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-6 col-xl-3">
+        <div class="card stat-card h-100 border-start border-danger">
+            <div class="card-body">
+                <h6 class="text-muted small">Pending Fees</h6>
+                <h3 class="fw-bold mb-0 text-break">UGX {{ pending_fees|floatformat:0 }}</h3>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if user|has_role:"admin,headteacher" %}
+<div class="row g-3 mb-3">
+    <div class="col-12 col-xl-4">
+        <div class="card h-100">
+            <div class="card-header bg-light"><strong>Quick Actions</strong></div>
+            <div class="card-body d-grid gap-2">
+                <a href="{% url 'students:add' %}" class="btn btn-outline-primary"><i class="bi bi-person-plus"></i> Add Student</a>
+                <a href="{% url 'fees:payment_list' %}" class="btn btn-outline-success"><i class="bi bi-cash-coin"></i> Record Payment</a>
+                <a href="{% url 'examinations:exam_list' %}" class="btn btn-outline-info"><i class="bi bi-clipboard-data"></i> Manage Exams</a>
+                <a href="{% url 'teachers:list' %}" class="btn btn-outline-secondary"><i class="bi bi-person-badge"></i> Teachers</a>
+                <a href="{% url 'core:class_list' %}" class="btn btn-outline-dark"><i class="bi bi-building"></i> Classes &amp; Subjects</a>
+                <a href="{% url 'communication:bulk_communication' %}" class="btn btn-outline-warning"><i class="bi bi-broadcast"></i> Notify Parents/Teachers</a>
+                {% if user.role == 'admin' %}
+                <a href="{% url 'accounts:user_list' %}" class="btn btn-outline-danger"><i class="bi bi-shield-lock"></i> System Users</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-8">
+        <div class="card h-100">
+            <div class="card-header bg-light"><strong>Recent Payments</strong></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                            {% for p in recent_payments %}
+                            <tr>
+                                <td class="text-break"><strong>{{ p.student.get_full_name }}</strong> paid UGX {{ p.amount_paid|floatformat:0 }}</td>
+                                <td class="text-end text-muted text-nowrap">{{ p.date_paid|date:"M d" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="2" class="text-muted p-3">No payments recorded yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row g-3">
+    <div class="col-12 col-xl-6">
+        <div class="card h-100">
+            <div class="card-header bg-light"><strong>Fee Collection Trend</strong></div>
+            <div class="card-body">
+                <div class="chart-wrap">
+                    <canvas id="feeTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-6">
+        <div class="card h-100">
+            <div class="card-header bg-light"><strong>Class Performance (Avg Exam Score)</strong></div>
+            <div class="card-body">
+                <div class="chart-wrap">
+                    <canvas id="classPerfChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if user.role == 'teacher' %}
+<div class="row g-3">
+    <div class="col-12 col-lg-5">
+        <div class="card h-100">
+            <div class="card-header bg-light"><strong>My Subjects &amp; Classes</strong></div>
+            <div class="card-body">
+                {% if subjects %}
+                <ul class="list-group list-group-flush">
+                    {% for subject in subjects %}
+                    <li class="list-group-item">{{ subject.name }} ({{ subject.class_room }})</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted mb-0">No subjects assigned yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-7">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <strong>Upcoming Exams</strong>
+                <a href="{% url 'examinations:teacher_exam_list' %}" class="btn btn-sm btn-primary">Enter Marks</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                            {% for exam in upcoming_exams %}
+                            <tr>
+                                <td class="text-break">{{ exam.name }} — {{ exam.subject.name }}</td>
+                                <td class="text-end text-nowrap">{{ exam.start_date }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td class="text-muted p-3">No upcoming exams.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if user.role == 'bursar' %}
+<div class="row g-3">
+    <div class="col-12 col-md-4">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Today's Collection</h6>
+                <h2 class="text-success fw-bold text-break">UGX {{ todays_collections|floatformat:0 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-8">
+        <div class="card h-100">
+            <div class="card-header">Recent Payments</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0 datatable" data-no-sort="1">
+                        <thead><tr><th>Student</th><th>Amount</th><th>Date</th></tr></thead>
+                        <tbody>
+                            {% for p in recent_payments %}
+                            <tr>
+                                <td>{{ p.student.get_full_name }}</td>
+                                <td class="text-nowrap">UGX {{ p.amount_paid|floatformat:0 }}</td>
+                                <td class="text-nowrap">{{ p.date_paid|date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if user|has_role:"admin,headteacher" %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const feeLabels = {{ fee_chart_labels|safe }};
+    const feeValues = {{ fee_chart_values|safe }};
+    const perfLabels = {{ perf_chart_labels|safe }};
+    const perfValues = {{ perf_chart_values|safe }};
+
+    const feeCtx = document.getElementById('feeTrendChart');
+    if (feeCtx && feeLabels.length) {
+        new Chart(feeCtx, {
+            type: 'bar',
+            data: {
+                labels: feeLabels,
+                datasets: [{
+                    label: 'Collected (UGX)',
+                    data: feeValues,
+                    backgroundColor: '#4AA3DF',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    } else if (feeCtx) {
+        feeCtx.closest('.chart-wrap').innerHTML = '<p class="text-muted text-center py-4 mb-0">No fee collection data yet.</p>';
+    }
+
+    const perfCtx = document.getElementById('classPerfChart');
+    if (perfCtx && perfLabels.length) {
+        new Chart(perfCtx, {
+            type: 'line',
+            data: {
+                labels: perfLabels,
+                datasets: [{
+                    label: 'Avg Score',
+                    data: perfValues,
+                    borderColor: '#2C7BB6',
+                    backgroundColor: 'rgba(44,123,182,0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, max: 100 } }
+            }
+        });
+    } else if (perfCtx) {
+        perfCtx.closest('.chart-wrap').innerHTML = '<p class="text-muted text-center py-4 mb-0">No exam results data yet.</p>';
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

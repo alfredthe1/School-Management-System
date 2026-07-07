@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block page_title %}Create Lesson Note{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h1 class="h3 fw-bold">Create Lesson Note</h1>
+    {% if is_staff_view %}
+    <p class="mb-0 opacity-75">Add a lesson note on behalf of any teacher</p>
+    {% else %}
+    <p class="mb-0 opacity-75">Record notes for your assigned subjects</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+            <div class="row g-3">
+                {% if is_staff_view %}
+                <div class="col-md-6">
+                    <label class="form-label">Teacher</label>
+                    {{ form.teacher }}
+                    {% if form.teacher.errors %}<div class="text-danger small">{{ form.teacher.errors }}</div>{% endif %}
+                </div>
+                {% endif %}
+                <div class="col-md-6">
+                    <label class="form-label">Subject</label>
+                    {{ form.subject }}
+                    {% if form.subject.errors %}<div class="text-danger small">{{ form.subject.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Class</label>
+                    {{ form.class_room }}
+                    {% if form.class_room.errors %}<div class="text-danger small">{{ form.class_room.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Date</label>
+                    {{ form.date }}
+                    {% if form.date.errors %}<div class="text-danger small">{{ form.date.errors }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Topic</label>
+                    {{ form.topic }}
+                    {% if form.topic.errors %}<div class="text-danger small">{{ form.topic.errors }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Content</label>
+                    {{ form.content }}
+                    {% if form.content.errors %}<div class="text-danger small">{{ form.content.errors }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Attachment (optional)</label>
+                    {{ form.attachments }}
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save Lesson Note</button>
+                <a href="{% url 'academics:lesson_notes' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

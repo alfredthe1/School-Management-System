@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block page_title %}Record Salary Payment{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-lg">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-cash"></i> Pay {{ staff.get_full_name }}</h5>
+            </div>
+            <div class="card-body">
+                {% if payroll_item %}
+                <div class="alert alert-info small">
+                    Payroll: {{ payroll_item.payroll_run.get_month_display }} {{ payroll_item.payroll_run.year }} —
+                    Net: UGX {{ payroll_item.net_pay|floatformat:0 }}
+                </div>
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-success">Record Payment</button>
+                    <a href="{% url 'staff:detail' staff.pk %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

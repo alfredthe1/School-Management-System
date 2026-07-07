@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block page_title %}Edit Marks — {{ student.get_full_name }}{% endblock %}
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h1 class="h3 fw-bold">Edit Marks &amp; Results</h1>
+    <p class="mb-0 opacity-75">{{ student.get_full_name }} • {{ student.student_id }} • {{ student.current_class|default:"—" }}</p>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="card mb-4">
+        <div class="card-header"><i class="bi bi-clipboard-data"></i> Exam Marks</div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Exam</th><th>Subject</th><th>Max</th>
+                            <th>Marks</th><th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in exam_rows %}
+                        <tr>
+                            <td>{{ row.exam.name }}</td>
+                            <td>{{ row.exam.subject.name }}</td>
+                            <td>{{ row.exam.max_marks }}</td>
+                            <td style="width:120px">
+                                <input type="number" name="exam_{{ row.exam.id }}" class="form-control form-control-sm"
+                                       step="0.5" min="0" max="{{ row.exam.max_marks }}"
+                                       value="{{ row.result.marks_obtained|default:'' }}">
+                            </td>
+                            <td>
+                                <input type="text" name="remarks_{{ row.exam.id }}" class="form-control form-control-sm"
+                                       value="{{ row.result.remarks|default:'' }}" placeholder="Optional">
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-muted text-center py-3">No exams available for this class.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% if continuous_results %}
+    <div class="card mb-4">
+        <div class="card-header"><i class="bi bi-journal-text"></i> Continuous Assessment</div>
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead>
+                    <tr><th>Subject</th><th>Term</th><th>Test Score</th><th>Exam Score</th><th>Grade</th></tr>
+                </thead>
+                <tbody>
+                    {% for ca in continuous_results %}
+                    <tr>
+                        <td>{{ ca.subject.name }}</td>
+                        <td>{{ ca.term }}</td>
+                        <td><input type="number" name="ca_test_{{ ca.id }}" class="form-control form-control-sm" step="0.01" value="{{ ca.test_score }}"></td>
+                        <td><input type="number" name="ca_exam_{{ ca.id }}" class="form-control form-control-sm" step="0.01" value="{{ ca.exam_score }}"></td>
+                        <td><input type="text" name="ca_grade_{{ ca.id }}" class="form-control form-control-sm" maxlength="2" value="{{ ca.grade }}"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if is_staff %}
+    <div class="card mb-4">
+        <div class="card-header"><i class="bi bi-plus-circle"></i> Add Continuous Assessment</div>
+        <div class="card-body">
+            <input type="hidden" name="add_ca" value="1">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Subject</label>
+                    {{ ca_form.subject }}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Term</label>
+                    {{ ca_form.term }}
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Test</label>
+                    {{ ca_form.test_score }}
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Exam</label>
+                    {{ ca_form.exam_score }}
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Grade</label>
+                    {{ ca_form.grade }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save Results</button>
+        <a href="{% url 'students:results' student.pk %}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+{% endblock %}

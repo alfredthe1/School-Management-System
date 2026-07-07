@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block page_title %}Pay School Fees{% endblock %}
+{% block extra_css %}
+<style>
+    .provider-option {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .provider-option:hover { border-color: #4AA3DF; background: #f8fafc; }
+    .provider-option.selected-mtn { border-color: #FFCC00; background: #fffbeb; }
+    .provider-option.selected-airtel { border-color: #E4002B; background: #fff5f5; }
+    .provider-option input { display: none; }
+    .provider-logo {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.7rem;
+        color: #fff;
+    }
+    .provider-logo.mtn { background: #FFCC00; color: #1a1a1a; }
+    .provider-logo.airtel { background: #E4002B; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h1 class="h3 fw-bold">Pay School Fees</h1>
+    <p class="mb-0 opacity-75">{{ student.get_full_name }} • {{ student.student_id }} • {{ student.current_class }}</p>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted">Fee Summary</h6>
+                <table class="table table-sm">
+                    <tr><td>Total Due</td><td class="text-end">UGX {{ total_due|floatformat:0 }}</td></tr>
+                    <tr><td>Total Paid</td><td class="text-end text-success">UGX {{ total_paid|floatformat:0 }}</td></tr>
+                    <tr class="fw-bold"><td>Balance</td><td class="text-end {% if balance > 0 %}text-danger{% else %}text-success{% endif %}">UGX {{ balance|floatformat:0 }}</td></tr>
+                </table>
+                {% if gateway.simulation_mode %}
+                <div class="alert alert-warning small mb-0">
+                    <i class="bi bi-hourglass-split"></i> <strong>Simulation mode</strong> — API keys not set yet. Payments are recorded for testing until MTN/Airtel credentials are added.
+                </div>
+                {% else %}
+                <div class="alert alert-success small mb-0">
+                    <i class="bi bi-phone-vibrate"></i> <strong>Live mobile money</strong> — you will receive a prompt on your phone. Enter your PIN to approve.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-phone-vibrate"></i> Pay via Mobile Money (Uganda)
+            </div>
+            <div class="card-body">
+                {% if balance <= 0 %}
+                <div class="alert alert-success">All fees are paid up for this child. Thank you!</div>
+                {% else %}
+                <form method="post" id="payForm">
+                    {% csrf_token %}
+
+                    <label class="form-label fw-semibold mb-2">Choose network</label>
+                    <div class="row g-2 mb-4">
+                        <div class="col-sm-6">
+                            <label class="provider-option w-100 mb-0" id="opt-mtn" data-provider="mtn">
+                                <input type="radio" name="provider" value="mtn" checked>
+                                <span class="provider-logo mtn">MTN</span>
+                                <span>
+                                    <strong>MTN Mobile Money</strong><br>
+                                    <small class="text-muted">Pay with your MTN MoMo wallet</small>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="provider-option w-100 mb-0" id="opt-airtel" data-provider="airtel">
+                                <input type="radio" name="provider" value="airtel">
+                                <span class="provider-logo airtel">Airtel</span>
+                                <span>
+                                    <strong>Airtel Money</strong><br>
+                                    <small class="text-muted">Pay with your Airtel Money wallet</small>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.fee_structure.label }}</label>
+                        {{ form.fee_structure }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.amount.label }}</label>
+                        {{ form.amount }}
+                        <small class="text-muted">Outstanding balance: UGX {{ balance|floatformat:0 }}</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.phone_number.label }}</label>
+                        {{ form.phone_number }}
+                        <small class="text-muted" id="phone-hint">You will receive a payment prompt on your MTN phone — enter your Mobile Money PIN to approve.</small>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-lg" id="payBtn">
+                        <i class="bi bi-phone-vibrate"></i> Pay School Fees
+                    </button>
+                </form>
+                {% endif %}
+                <hr>
+                <h6>Fee Breakdown</h6>
+                <ul class="list-unstyled small">
+                    {% for fs in fee_structures %}
+                    <li>{{ fs.name }}: UGX {{ fs.amount|floatformat:0 }}</li>
+                    {% empty %}
+                    <li class="text-muted">No fee structures set for this class.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<a href="{% url 'parents:child_progress' student.id %}" class="btn btn-link mt-2">← Back to {{ student.first_name }}'s report</a>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    var optMtn = document.getElementById('opt-mtn');
+    var optAirtel = document.getElementById('opt-airtel');
+    var hint = document.getElementById('phone-hint');
+    var payBtn = document.getElementById('payBtn');
+    if (!optMtn) return;
+
+    function updateProvider() {
+        var mtn = document.querySelector('input[name="provider"][value="mtn"]').checked;
+        optMtn.classList.toggle('selected-mtn', mtn);
+        optMtn.classList.toggle('selected-airtel', false);
+        optAirtel.classList.toggle('selected-airtel', !mtn);
+        optAirtel.classList.toggle('selected-mtn', false);
+        if (hint) {
+            hint.textContent = mtn
+                ? 'You will receive a payment prompt on your MTN number — enter your Mobile Money PIN to approve.'
+                : 'You will receive a payment prompt on your Airtel number — enter your Airtel Money PIN to approve.';
+        }
+        if (payBtn) {
+            payBtn.innerHTML = mtn
+                ? '<i class="bi bi-phone-vibrate"></i> Pay with MTN Mobile Money'
+                : '<i class="bi bi-phone-vibrate"></i> Pay with Airtel Money';
+        }
+    }
+    document.querySelectorAll('input[name="provider"]').forEach(function (r) {
+        r.addEventListener('change', updateProvider);
+    });
+    updateProvider();
+})();
+</script>
+{% endblock %}

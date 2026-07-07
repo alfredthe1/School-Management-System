@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% block page_title %}My Payroll{% endblock %}
+{% block content %}
+<div class="mb-4">
+    <h4 class="mb-1"><i class="bi bi-wallet2"></i> My Payroll</h4>
+    <p class="text-muted">Your salary and allowance allocation for the current month.</p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <h6 class="text-muted small">Base Salary</h6>
+                <h4 class="text-primary">UGX {{ projected_base|floatformat:0 }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <h6 class="text-muted small">Allowances</h6>
+                <h4 class="text-info">UGX {{ projected_allowances|floatformat:0 }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 border-start border-success border-3">
+            <div class="card-body text-center">
+                <h6 class="text-muted small">Expected This Month</h6>
+                <h4 class="text-success fw-bold">UGX {{ projected_net|floatformat:0 }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <h6 class="text-muted small">Paid YTD ({{ current_year }})</h6>
+                <h4>UGX {{ ytd_paid|floatformat:0 }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="bi bi-list-check"></i> My Allowances</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Allowance</th><th>Amount</th><th>Description</th></tr></thead>
+                    <tbody>
+                        {% for a in allowances %}
+                        <tr>
+                            <td>{{ a.name }}</td>
+                            <td>UGX {{ a.amount|floatformat:0 }}</td>
+                            <td>{{ a.description|default:"—" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-center text-muted py-3">No allowances allocated yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                    {% if allowances %}
+                    <tfoot>
+                        <tr class="table-light">
+                            <th>Total Allowances</th>
+                            <th colspan="2">UGX {{ projected_allowances|floatformat:0 }}</th>
+                        </tr>
+                    </tfoot>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+
+        {% if current_item %}
+        <div class="card border-0 shadow-sm mt-3">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0">Official Payroll — {{ current_item.payroll_run.get_month_display }} {{ current_item.payroll_run.year }}</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6"><p>Base Salary</p></div>
+                    <div class="col-6 text-end"><p>UGX {{ current_item.base_salary|floatformat:0 }}</p></div>
+                    <div class="col-6"><p>Allowances</p></div>
+                    <div class="col-6 text-end"><p>UGX {{ current_item.total_allowances|floatformat:0 }}</p></div>
+                    {% if current_item.deductions %}
+                    <div class="col-6"><p class="text-danger">Deductions</p></div>
+                    <div class="col-6 text-end"><p class="text-danger">- UGX {{ current_item.deductions|floatformat:0 }}</p></div>
+                    {% endif %}
+                    <div class="col-12"><hr></div>
+                    <div class="col-6"><h5>Net Pay</h5></div>
+                    <div class="col-6 text-end"><h5 class="text-success">UGX {{ current_item.net_pay|floatformat:0 }}</h5></div>
+                </div>
+                <span class="badge bg-{% if current_item.payroll_run.status == 'paid' %}success{% else %}warning text-dark{% endif %}">
+                    {{ current_item.payroll_run.get_status_display }}
+                </span>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info mt-3 small">
+            <i class="bi bi-info-circle"></i>
+            Official payroll for this month has not been generated yet. The figures above reflect your current allocation.
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-light"><h6 class="mb-0">Payment History</h6></div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Reference</th></tr></thead>
+                    <tbody>
+                        {% for p in payment_history %}
+                        <tr>
+                            <td>{{ p.payment_date|date:"M d, Y" }}</td>
+                            <td class="text-success fw-bold">UGX {{ p.amount_paid|floatformat:0 }}</td>
+                            <td>{{ p.get_payment_method_display }}</td>
+                            <td>{{ p.reference|default:"—" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted py-3">No payments received yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light"><h6 class="mb-0">Past Payroll Records</h6></div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Period</th><th>Net Pay</th><th>Status</th></tr></thead>
+                    <tbody>
+                        {% for item in past_payrolls %}
+                        <tr>
+                            <td>{{ item.payroll_run.get_month_display }} {{ item.payroll_run.year }}</td>
+                            <td>UGX {{ item.net_pay|floatformat:0 }}</td>
+                            <td><span class="badge bg-{% if item.payroll_run.status == 'paid' %}success{% else %}secondary{% endif %}">{{ item.payroll_run.get_status_display }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-center text-muted py-3">No past payroll records.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-body small text-muted">
+        <strong>Employee ID:</strong> {{ staff.employee_id }} &nbsp;|&nbsp;
+        <strong>Job Title:</strong> {{ staff.job_title }} &nbsp;|&nbsp;
+        <strong>Department:</strong> {{ staff.get_department_display }}
+        {% if staff.bank_name %}&nbsp;|&nbsp; <strong>Bank:</strong> {{ staff.bank_name }} ({{ staff.bank_account }}){% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block page_title %}{{ student.get_full_name }} — Results{% endblock %}
+{% block content %}
+<div class="dashboard-header mb-4 d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+        <h1 class="h3 fw-bold">{{ student.get_full_name }}</h1>
+        <p class="mb-0 opacity-75">{{ student.student_id }} • {{ student.current_class|default:"No class" }}
+            {% if exam_avg %}• Avg: {{ exam_avg }}%{% endif %}
+        </p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        {% if can_edit %}
+        <a href="{% url 'students:results_edit' student.pk %}" class="btn btn-light btn-sm">
+            <i class="bi bi-pencil"></i> Edit Marks
+        </a>
+        {% endif %}
+        <a href="{% url 'reports:student_report_card' student.id %}" class="btn btn-outline-light btn-sm" target="_blank">
+            <i class="bi bi-file-pdf"></i> Report Card
+        </a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-clipboard-data"></i> Exam Results</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 datatable">
+                <thead>
+                    <tr>
+                        <th>Exam</th><th>Subject</th><th>Term</th>
+                        <th>Marks</th><th>Grade</th><th>Remarks</th><th>Published</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in exam_rows %}
+                    <tr>
+                        <td>{{ row.exam.name }}</td>
+                        <td>{{ row.exam.subject.name }}</td>
+                        <td>{{ row.exam.term }}</td>
+                        <td>
+                            {% if row.result %}
+                            {{ row.result.marks_obtained }} / {{ row.exam.max_marks }}
+                            {% else %}<span class="text-muted">Not entered</span>{% endif %}
+                        </td>
+                        <td>{% if row.result %}<span class="badge bg-primary">{{ row.result.grade }}</span>{% else %}—{% endif %}</td>
+                        <td>{{ row.result.remarks|default:"—" }}</td>
+                        <td>{% if row.exam.is_published %}<span class="badge bg-success">Yes</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-muted text-center py-4">No exams for this student's class.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-journal-text"></i> Continuous Assessment</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 datatable">
+                <thead>
+                    <tr><th>Subject</th><th>Term</th><th>Test</th><th>Exam</th><th>Total</th><th>Grade</th></tr>
+                </thead>
+                <tbody>
+                    {% for r in continuous_results %}
+                    <tr>
+                        <td>{{ r.subject.name }}</td>
+                        <td>{{ r.term }}</td>
+                        <td>{{ r.test_score }}</td>
+                        <td>{{ r.exam_score }}</td>
+                        <td><strong>{{ r.total }}</strong></td>
+                        <td>{{ r.grade|default:"—" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-muted text-center py-4">No continuous assessment records.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<a href="{% url 'students:detail' student.pk %}" class="btn btn-link">← Back to student profile</a>
+{% endblock %}

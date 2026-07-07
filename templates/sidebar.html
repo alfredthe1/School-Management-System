@@ -1,0 +1,300 @@
+{% load role_tags %}{% with p=id_prefix|default:"" %}
+<ul class="nav flex-column sidebar-nav">
+    {% if user.role == 'parent' %}
+    {% if user|can_access:'parent_dashboard' %}
+    <li class="nav-item">
+        <a href="{% url 'parents:dashboard' %}" class="nav-link {% if 'parents/dashboard' in request.path %}active{% endif %}" title="Dashboard">
+            <i class="bi bi-speedometer2"></i><span class="sidebar-label">Dashboard</span>
+        </a>
+    </li>
+    {% endif %}
+    {% if user|can_access:'parent_children' %}
+    <li class="nav-item">
+        <a href="{% url 'parents:my_children' %}" class="nav-link {% if 'parents/children' in request.path or 'parents/child' in request.path %}active{% endif %}" title="My Children">
+            <i class="bi bi-people"></i><span class="sidebar-label">My Children</span>
+        </a>
+    </li>
+    {% endif %}
+    {% if user|can_access:'parent_link_child' %}
+    <li class="nav-item">
+        <a href="{% url 'parents:link_child' %}" class="nav-link {% if 'link-child' in request.path %}active{% endif %}" title="Link a Child">
+            <i class="bi bi-link-45deg"></i><span class="sidebar-label">Link a Child</span>
+        </a>
+    </li>
+    {% endif %}
+    {% if user|can_access:'parent_pay_fees' %}
+    <li class="nav-item has-submenu">
+        <a href="#" class="nav-link {% if 'parents/pay' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#{{ p }}parentFeesMenu" title="Pay School Fees">
+            <i class="bi bi-wallet2"></i><span class="sidebar-label">Pay School Fees</span>
+            <i class="bi bi-chevron-down sidebar-chevron small"></i>
+        </a>
+        <div class="collapse ms-3 {% if 'parents/pay' in request.path %}show{% endif %}" id="{{ p }}parentFeesMenu">
+            <a href="{% url 'parents:pay_fees_hub' %}" class="nav-link small py-1"><span class="sidebar-label">All Children</span></a>
+            {% for item in parent_children_nav %}
+            <a href="{% url 'parents:pay_fees' item.student.id %}" class="nav-link small py-1">
+                <span class="sidebar-label">{{ item.student.first_name }}
+                {% if item.balance > 0 %}
+                <span class="badge bg-warning text-dark ms-1">UGX {{ item.balance|floatformat:0 }}</span>
+                {% else %}
+                <span class="badge bg-success ms-1">Paid</span>
+                {% endif %}</span>
+            </a>
+            {% empty %}
+            <span class="nav-link small text-white-50 py-1 sidebar-label">No children linked</span>
+            {% endfor %}
+        </div>
+    </li>
+    {% endif %}
+    {% if user|can_access:'parent_payment_history' %}
+    <li class="nav-item">
+        <a href="{% url 'parents:payment_history' %}" class="nav-link {% if 'payments/history' in request.path %}active{% endif %}" title="Payment History">
+            <i class="bi bi-receipt"></i><span class="sidebar-label">Payment History</span>
+        </a>
+    </li>
+    {% endif %}
+    {% if user|can_access:'communication' %}
+    <li class="nav-item">
+        <a href="{% url 'communication:inbox' %}" class="nav-link {% if 'communication' in request.path %}active{% endif %}" title="Notifications">
+            <i class="bi bi-bell"></i><span class="sidebar-label">Notifications</span>
+            {% if unread_notifications_count %}<span class="badge bg-danger ms-1">{{ unread_notifications_count }}</span>{% endif %}
+        </a>
+    </li>
+    {% endif %}
+    {% if user|can_access:'announcements' %}
+    <li class="nav-item">
+        <a href="{% url 'announcements:list' %}" class="nav-link {% if 'announcements' in request.path %}active{% endif %}" title="Announcements">
+            <i class="bi bi-megaphone"></i><span class="sidebar-label">Announcements</span>
+        </a>
+    </li>
+    {% endif %}
+    <li class="nav-item">
+        <a href="{% url 'accounts:profile' %}" class="nav-link {% if 'accounts/profile' in request.path %}active{% endif %}" title="My Profile">
+            <i class="bi bi-person"></i><span class="sidebar-label">My Profile</span>
+        </a>
+    </li>
+
+    {% elif user.role == 'teacher' %}
+    {% if user|can_access:'dashboard' %}
+    <li class="nav-item">
+        <a href="{% url 'core:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" title="Dashboard">
+            <i class="bi bi-speedometer2"></i><span class="sidebar-label">Dashboard</span>
+        </a>
+    </li>
+    {% endif %}
+    {% if user|can_access:'academics' %}
+    <li class="nav-item has-submenu">
+        <a href="#" class="nav-link" data-bs-toggle="collapse" data-bs-target="#{{ p }}academicsMenu" title="Academics">
+            <i class="bi bi-book"></i><span class="sidebar-label">Academics</span>
+            <i class="bi bi-chevron-down sidebar-chevron small"></i>
+        </a>
+        <div class="collapse ms-3" id="{{ p }}academicsMenu">
+            <a href="{% url 'academics:timetable' %}" class="nav-link small py-1"><span class="sidebar-label">Timetable</span></a>
+            <a href="{% url 'academics:lesson_notes' %}" class="nav-link small py-1"><span class="sidebar-label">Lesson Notes</span></a>
+            <a href="{% url 'academics:class_results' %}" class="nav-link small py-1"><span class="sidebar-label">Class Results</span></a>
+            <a href="{% url 'core:teacher_lesson_plans' %}" class="nav-link small py-1"><span class="sidebar-label">Lesson Plans</span></a>
+        </div>
+    </li>
+    {% endif %}
+    {% if user|can_access:'examinations' %}
+    <li class="nav-item has-submenu">
+        <a href="#" class="nav-link" data-bs-toggle="collapse" data-bs-target="#{{ p }}examMenu" title="Examinations">
+            <i class="bi bi-clipboard-check"></i><span class="sidebar-label">Examinations</span>
+            <i class="bi bi-chevron-down sidebar-chevron small"></i>
+        </a>
+        <div class="collapse ms-3" id="{{ p }}examMenu">
+            <a href="{% url 'examinations:teacher_marks_hub' %}" class="nav-link small py-1"><span class="sidebar-label">My Subjects &amp; Marks</span></a>
+            <a href="{% url 'examinations:teacher_view_results' %}" class="nav-link small py-1"><span class="sidebar-label">View Results</span></a>
+        </div>
+    </li>
+    {% endif %}
+    {% if user|can_access:'communication' %}
+    <li class="nav-item">
+        <a href="{% url 'communication:inbox' %}" class="nav-link {% if 'communication' in request.path %}active{% endif %}" title="Notifications">
+            <i class="bi bi-bell"></i><span class="sidebar-label">Notifications</span>
+            {% if unread_notifications_count %}<span class="badge bg-danger ms-1">{{ unread_notifications_count }}</span>{% endif %}
+        </a>
+    </li>
+    {% endif %}
+    {% if user|can_access:'announcements' %}
+    <li class="nav-item">
+        <a href="{% url 'announcements:list' %}" class="nav-link {% if 'announcements' in request.path %}active{% endif %}" title="Announcements">
+            <i class="bi bi-megaphone"></i><span class="sidebar-label">Announcements</span>
+        </a>
+    </li>
+    {% endif %}
+    {% if user_staff_profile and user|can_access:'my_payroll' %}
+    <li class="nav-item">
+        <a href="{% url 'staff:my_payroll' %}" class="nav-link {% if 'staff/my-payroll' in request.path %}active{% endif %}" title="My Payroll">
+            <i class="bi bi-wallet2"></i><span class="sidebar-label">My Payroll</span>
+        </a>
+    </li>
+    {% endif %}
+
+    {% else %}
+    {% if user|can_access:'dashboard' %}
+    <li class="nav-item">
+        <a href="{% url 'core:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" title="Dashboard">
+            <i class="bi bi-speedometer2"></i><span class="sidebar-label">Dashboard</span>
+        </a>
+    </li>
+    {% endif %}
+
+    {% if user|can_access:'students' %}
+    <li class="nav-item">
+        <a href="{% url 'students:list' %}" class="nav-link {% if 'students' in request.path %}active{% endif %}" title="Students">
+            <i class="bi bi-people"></i><span class="sidebar-label">Students</span>
+        </a>
+    </li>
+    {% endif %}
+
+    {% if user|can_access:'system_users' %}
+    <li class="nav-item">
+        <a href="{% url 'accounts:user_list' %}" class="nav-link {% if 'accounts/users' in request.path %}active{% endif %}" title="System Users">
+            <i class="bi bi-shield-lock"></i><span class="sidebar-label">System Users</span>
+        </a>
+    </li>
+    {% endif %}
+
+    {% if user|can_access:'school_structure' %}
+    <li class="nav-item has-submenu">
+        <a href="#" class="nav-link {% if 'classes' in request.path or 'subjects' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#{{ p }}structureMenu" title="School Structure">
+            <i class="bi bi-diagram-3"></i><span class="sidebar-label">School Structure</span>
+            <i class="bi bi-chevron-down sidebar-chevron small"></i>
+        </a>
+        <div class="collapse ms-3 {% if 'classes' in request.path or 'subjects' in request.path %}show{% endif %}" id="{{ p }}structureMenu">
+            <a href="{% url 'core:class_list' %}" class="nav-link small py-1"><span class="sidebar-label"><i class="bi bi-building"></i> Classes &amp; Streams</span></a>
+            <a href="{% url 'core:subject_list' %}" class="nav-link small py-1"><span class="sidebar-label"><i class="bi bi-journal-bookmark"></i> Subjects</span></a>
+            <a href="{% url 'core:subject_assignments' %}" class="nav-link small py-1"><span class="sidebar-label"><i class="bi bi-person-check"></i> Teacher Assignments</span></a>
+        </div>
+    </li>
+    {% endif %}
+
+    {% if user|can_access:'staff_payroll' %}
+    <li class="nav-item has-submenu">
+        <a href="#" class="nav-link {% if 'staff' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#{{ p }}staffMenu" title="Staff &amp; Payroll">
+            <i class="bi bi-person-workspace"></i><span class="sidebar-label">Staff &amp; Payroll</span>
+            <i class="bi bi-chevron-down sidebar-chevron small"></i>
+        </a>
+        <div class="collapse ms-3 {% if 'staff' in request.path %}show{% endif %}" id="{{ p }}staffMenu">
+            <a href="{% url 'staff:list' %}" class="nav-link small py-1"><span class="sidebar-label">Staff Management</span></a>
+            <a href="{% url 'staff:add' %}" class="nav-link small py-1"><span class="sidebar-label">Add Staff</span></a>
+            <a href="{% url 'staff:payroll_dashboard' %}" class="nav-link small py-1"><span class="sidebar-label">Payroll</span></a>
+            {% if user_staff_profile %}
+            <a href="{% url 'staff:my_payroll' %}" class="nav-link small py-1"><span class="sidebar-label">My Payroll</span></a>
+            {% endif %}
+        </div>
+    </li>
+    {% endif %}
+    {% if user|can_access:'teachers' %}
+    <li class="nav-item">
+        <a href="{% url 'teachers:list' %}" class="nav-link {% if 'teachers' in request.path %}active{% endif %}" title="Teachers">
+            <i class="bi bi-person-badge"></i><span class="sidebar-label">Teachers</span>
+        </a>
+    </li>
+    {% endif %}
+
+    {% if user|can_access:'academics' %}
+    <li class="nav-item has-submenu">
+        <a href="#" class="nav-link" data-bs-toggle="collapse" data-bs-target="#{{ p }}academicsMenuAdmin" title="Academics">
+            <i class="bi bi-book"></i><span class="sidebar-label">Academics</span>
+            <i class="bi bi-chevron-down sidebar-chevron small"></i>
+        </a>
+        <div class="collapse ms-3" id="{{ p }}academicsMenuAdmin">
+            <a href="{% url 'academics:timetable' %}" class="nav-link small py-1"><span class="sidebar-label">Timetable</span></a>
+            <a href="{% url 'academics:lesson_notes' %}" class="nav-link small py-1"><span class="sidebar-label">Lesson Notes</span></a>
+            <a href="{% url 'academics:class_results' %}" class="nav-link small py-1"><span class="sidebar-label">Class Results</span></a>
+        </div>
+    </li>
+    {% endif %}
+
+    {% if user|can_access:'examinations' %}
+    <li class="nav-item has-submenu">
+        <a href="#" class="nav-link" data-bs-toggle="collapse" data-bs-target="#{{ p }}examMenuAdmin" title="Examinations">
+            <i class="bi bi-clipboard-check"></i><span class="sidebar-label">Examinations</span>
+            <i class="bi bi-chevron-down sidebar-chevron small"></i>
+        </a>
+        <div class="collapse ms-3" id="{{ p }}examMenuAdmin">
+            <a href="{% url 'examinations:exam_list' %}" class="nav-link small py-1"><span class="sidebar-label">Manage Exams</span></a>
+            <a href="{% url 'examinations:exam_results_list' %}" class="nav-link small py-1"><span class="sidebar-label">View Results</span></a>
+            <a href="{% url 'examinations:grade_scales' %}" class="nav-link small py-1"><span class="sidebar-label">Grade Scales</span></a>
+        </div>
+    </li>
+    {% endif %}
+
+    {% if user|can_access:'fees' %}
+    <li class="nav-item has-submenu">
+        <a href="#" class="nav-link" data-bs-toggle="collapse" data-bs-target="#{{ p }}feesMenu" title="Fees">
+            <i class="bi bi-wallet2"></i><span class="sidebar-label">Fees</span>
+            <i class="bi bi-chevron-down sidebar-chevron small"></i>
+        </a>
+        <div class="collapse ms-3" id="{{ p }}feesMenu">
+            <a href="{% url 'fees:fee_dashboard' %}" class="nav-link small py-1"><span class="sidebar-label">Dashboard</span></a>
+            <a href="{% url 'fees:record_payment' %}" class="nav-link small py-1"><span class="sidebar-label">Record Payment</span></a>
+            <a href="{% url 'fees:fee_structure_list' %}" class="nav-link small py-1"><span class="sidebar-label">Fee Structures</span></a>
+            <a href="{% url 'fees:payment_list' %}" class="nav-link small py-1"><span class="sidebar-label">Payments</span></a>
+            <a href="{% url 'fees:expenditure_list' %}" class="nav-link small py-1"><span class="sidebar-label">Expenditures</span></a>
+            <a href="{% url 'fees:collection_report' %}" class="nav-link small py-1"><span class="sidebar-label">Collection Report</span></a>
+            <a href="{% url 'core:import_hub' %}" class="nav-link small py-1"><span class="sidebar-label">Import CSV Data</span></a>
+            {% if user|can_access:'payment_gateway' %}
+            <a href="{% url 'fees:payment_gateway' %}" class="nav-link small py-1"><span class="sidebar-label"><i class="bi bi-phone-vibrate"></i> Payment Gateway</span></a>
+            {% endif %}
+            {% if user|has_role:"admin" %}
+            <a href="{% url 'fees:parent_result_access' %}" class="nav-link small py-1"><span class="sidebar-label"><i class="bi bi-shield-lock"></i> Parent Result Access</span></a>
+            {% endif %}
+        </div>
+    </li>
+    {% endif %}
+
+    {% if user_staff_profile and user|can_access:'my_payroll' and not user|has_role:"admin,headteacher" %}
+    <li class="nav-item">
+        <a href="{% url 'staff:my_payroll' %}" class="nav-link {% if 'staff/my-payroll' in request.path %}active{% endif %}" title="My Payroll">
+            <i class="bi bi-wallet2"></i><span class="sidebar-label">My Payroll</span>
+        </a>
+    </li>
+    {% endif %}
+
+    {% if user|can_access:'communication' %}
+    <li class="nav-item has-submenu">
+        <a href="#" class="nav-link {% if 'communication' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#{{ p }}commMenu" title="Communication">
+            <i class="bi bi-broadcast"></i><span class="sidebar-label">Communication</span>
+            <i class="bi bi-chevron-down sidebar-chevron small"></i>
+        </a>
+        <div class="collapse ms-3 {% if 'communication' in request.path %}show{% endif %}" id="{{ p }}commMenu">
+            <a href="{% url 'communication:inbox' %}" class="nav-link small py-1"><span class="sidebar-label"><i class="bi bi-bell"></i> Notifications</span></a>
+            {% if user|has_role:"admin,headteacher" %}
+            <a href="{% url 'communication:bulk_communication' %}" class="nav-link small py-1"><span class="sidebar-label"><i class="bi bi-send"></i> Bulk SMS/Email</span></a>
+            <a href="{% url 'communication:send_message' %}" class="nav-link small py-1"><span class="sidebar-label"><i class="bi bi-chat-dots"></i> Compose Message</span></a>
+            {% endif %}
+        </div>
+    </li>
+    {% endif %}
+    {% if user|can_access:'announcements' %}
+    <li class="nav-item">
+        <a href="{% url 'announcements:list' %}" class="nav-link {% if 'announcements' in request.path %}active{% endif %}" title="Announcements">
+            <i class="bi bi-megaphone"></i><span class="sidebar-label">Announcements</span>
+        </a>
+    </li>
+    {% endif %}
+    {% if user|can_access:'reports' %}
+    <li class="nav-item has-submenu">
+        <a href="#" class="nav-link" data-bs-toggle="collapse" data-bs-target="#{{ p }}reportsMenu" title="Reports">
+            <i class="bi bi-bar-chart"></i><span class="sidebar-label">Reports</span>
+            <i class="bi bi-chevron-down sidebar-chevron small"></i>
+        </a>
+        <div class="collapse ms-3" id="{{ p }}reportsMenu">
+            <a href="{% url 'core:import_hub' %}" class="nav-link small py-1"><span class="sidebar-label">Import CSV Data</span></a>
+            <a href="{% url 'reports:excel_report' %}" class="nav-link small py-1"><span class="sidebar-label">Excel Export</span></a>
+            <a href="{% url 'reports:custom_report' %}" class="nav-link small py-1"><span class="sidebar-label">Custom Builder</span></a>
+        </div>
+    </li>
+    {% endif %}
+    {% if user|can_access:'landing_images' %}
+    <li class="nav-item">
+        <a href="{% url 'core:landing_images_upload' %}" class="nav-link" title="Landing Images">
+            <i class="bi bi-image"></i><span class="sidebar-label">Landing Images</span>
+        </a>
+    </li>
+    {% endif %}
+    {% endif %}
+</ul>
+{% endwith %}

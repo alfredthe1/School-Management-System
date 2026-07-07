@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block page_title %}Subjects{% endblock %}
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #1E3A5F, #2C7BB6);">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h4 class="mb-0"><i class="bi bi-journal-bookmark"></i> Subject Management</h4>
+            <div class="d-flex gap-2">
+                <a href="{% url 'core:class_list' %}" class="btn btn-light btn-sm"><i class="bi bi-building"></i> Classes</a>
+                <a href="{% url 'core:subject_assignments' %}" class="btn btn-warning btn-sm"><i class="bi bi-person-check"></i> Assign Teachers</a>
+                <a href="{% url 'core:subject_create' %}" class="btn btn-success btn-sm"><i class="bi bi-plus-circle"></i> Add Subject</a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <form method="get" class="row g-2 mb-4">
+            <div class="col-md-3">
+                <input type="text" name="search" class="form-control" placeholder="Search subject..." value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <select name="year" class="form-select">
+                    <option value="">All years</option>
+                    {% for y in years %}
+                    <option value="{{ y.id }}" {% if selected_year and selected_year.id == y.id %}selected{% endif %}>{{ y.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="class" class="form-select">
+                    <option value="">All classes</option>
+                    {% for c in classes %}
+                    <option value="{{ c.id }}" {% if selected_class_id == c.id|stringformat:"s" %}selected{% endif %}>{{ c.display_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel"></i> Filter</button>
+            </div>
+        </form>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle datatable">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-book"></i> Subject</th>
+                        <th>Code</th>
+                        <th><i class="bi bi-building"></i> Class</th>
+                        <th><i class="bi bi-diagram-3"></i> Stream</th>
+                        <th><i class="bi bi-person-badge"></i> Teacher</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in subjects %}
+                    <tr>
+                        <td><strong>{{ s.name }}</strong></td>
+                        <td><code>{{ s.code }}</code></td>
+                        <td>{{ s.class_room.name }}</td>
+                        <td><span class="badge bg-info text-dark">{{ s.class_room.stream_label }}</span></td>
+                        <td>
+                            {% if s.teacher %}
+                            <i class="bi bi-person-check-fill text-success"></i> {{ s.teacher.get_full_name|default:s.teacher.username }}
+                            {% else %}<span class="badge bg-warning text-dark"><i class="bi bi-exclamation-circle"></i> Unassigned</span>{% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'core:subject_edit' s.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center text-muted py-4">No subjects found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
