@@ -4,7 +4,31 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-!replace-this-with-random-key'
 DEBUG = True
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+# -------------------------------------------------------------------
+# ALLOWED_HOSTS – use hostnames only, no scheme/path
+# -------------------------------------------------------------------
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'blend-skydiver-overlabor.ngrok-free.dev',   # your Ngrok tunnel
+    '.ngrok.io',                # any *.ngrok.io
+    '.ngrok.app',               # any *.ngrok.app
+    '.ngrok-free.dev',          # any *.ngrok-free.dev
+    '*',                      # ← keep commented for production; enable only for quick tests
+]
+
+# -------------------------------------------------------------------
+# CSRF_TRUSTED_ORIGINS – must include scheme + host (no trailing slash)
+# -------------------------------------------------------------------
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'https://blend-skydiver-overlabor.ngrok-free.dev',
+    'https://*.ngrok-free.dev',
+    'https://*.ngrok.io',
+    'https://*.ngrok.app',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -33,13 +57,14 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # The proxy middleware should run early to fix request scheme/host
+    'school.middleware.ProxyMiddleware',         # ← moved up
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'school.middleware.ProxyMiddleware',  # Add the ProxyMiddleware here
     'school.middleware.ActivityLogMiddleware',
 ]
 
@@ -99,12 +124,23 @@ LOGIN_REDIRECT_URL = 'core:dashboard'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# SMS (Twilio) – optional
+# -------------------------------------------------------------------
+# Ngrok / proxy settings – essential for HTTPS & correct host headers
+# -------------------------------------------------------------------
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
+# Force secure cookies when behind HTTPS (Ngrok sets X-Forwarded-Proto: https)
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+# Note: If you also need to test via plain http://localhost, comment out the two lines above.
+
+# SMS (Twilio)
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', '')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', '')
 TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER', '')
 
-# M-Pesa Daraja API (Safaricom) – set environment variables for live payments
+# M-Pesa Daraja API
 MPESA_ENV = os.environ.get('MPESA_ENV', 'sandbox')
 MPESA_CONSUMER_KEY = os.environ.get('MPESA_CONSUMER_KEY', '')
 MPESA_CONSUMER_SECRET = os.environ.get('MPESA_CONSUMER_SECRET', '')
